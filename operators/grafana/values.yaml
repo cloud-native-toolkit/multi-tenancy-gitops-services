@@ -1,1 +1,12 @@
 global: {}
+
+grafana-operator:
+  subscriptions:
+    grafana:
+      name: grafana-operator
+      subscription:
+        channel: alpha
+        installPlanApproval: Automatic
+        name: grafana-operator
+        source: community-operators
+        sourceNamespace: openshift-marketplace
