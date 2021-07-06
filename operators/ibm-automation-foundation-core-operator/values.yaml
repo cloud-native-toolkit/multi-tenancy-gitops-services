@@ -1,0 +1,20 @@
+global: {}
+
+ibm-automation-foundation-core-operator:
+  subscriptions:
+    ibmautomation:
+      name: ibm-automation-foundation-core
+      subscription:
+        channel: v1.0
+        config:
+          resources:
+            limits:
+              cpu: 200m
+              memory: 300Mi
+            requests:
+              cpu: 150m
+              memory: 200Mi
+        installPlanApproval: Automatic
+        name: ibm-automation
+        source: ibm-operator-catalog
+        sourceNamespace: openshift-marketplace
