@@ -1,0 +1,12 @@
+global: {}
+
+ibm-cpd-scheduling-operator:
+  subscriptions:
+    ibmcpdscheduling:
+      name: ibm-cpd-scheduling-catalog-subscription
+      subscription:
+        channel: alpha
+        installPlanApproval: Automatic
+        name: ibm-cpd-scheduling-operator
+        source: ibm-operator-catalog
+        sourceNamespace: openshift-marketplace
