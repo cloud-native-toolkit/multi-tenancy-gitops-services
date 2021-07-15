@@ -3,7 +3,7 @@ global: {}
 ibm-cpd-platform-operator:
   subscriptions:
     ibmcpdplatform:
-      name: ibm-cpd-scheduling-catalog-subscription
+      name: ibm-cpd-platform-catalog-subscription
       subscription:
         channel: stable-v1
         installPlanApproval: Automatic
