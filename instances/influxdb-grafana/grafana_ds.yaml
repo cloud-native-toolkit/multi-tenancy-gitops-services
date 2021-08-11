@@ -1,0 +1,21 @@
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDataSource
+metadata:
+  name: example-grafanadatasource
+  namespace: tools
+spec:
+  datasources:
+  - name: prevail-influxdb
+    type: influxdb
+    access: proxy
+    database: gatling
+    url: http://influxdb-service:8086/
+    jsonData:
+      timeInterval: "15s"
+    isDefault: true
+    version: 1
+    editable: false
+    basicAuth: true
+    basicAuthUser: user
+    basicAuthPassword: kraken      
+  name: grafana-ds.yaml
