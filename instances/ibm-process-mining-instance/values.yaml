@@ -1,5 +1,6 @@
 ibm-process-mining-instance:
   ibmprocessmininginstance:
+    name: processmining
     spec:
       license:
         accept: true
