@@ -6,4 +6,4 @@ version: 0.1.0
 dependencies:
   - name: pact-broker
     version: 0.1.0
-    repository: https://cloud-native-toolkit.github.io/toolkit-charts/
+    repository: https://charts.cloudnativetoolkit.dev
