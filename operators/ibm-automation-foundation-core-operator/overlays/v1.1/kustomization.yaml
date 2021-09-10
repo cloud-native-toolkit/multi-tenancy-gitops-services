@@ -9,5 +9,5 @@ patchesJson6902:
     group: operators.coreos.com
     version: v1alpha1
     kind: Subscription
-    name: ibm-automation
+    name: ibm-automation-foundation-core
   path: patch-channel.yaml

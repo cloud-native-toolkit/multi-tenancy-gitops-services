@@ -6,15 +6,7 @@ ibm-automation-foundation-core-operator:
       name: ibm-automation-foundation-core
       subscription:
         channel: v1.1
-        config:
-          resources:
-            limits:
-              cpu: 200m
-              memory: 300Mi
-            requests:
-              cpu: 150m
-              memory: 200Mi
         installPlanApproval: Automatic
-        name: ibm-automation
-        source: ibm-operator-catalog
+        name: ibm-automation-core
+        source: iaf-core-operators
         sourceNamespace: openshift-marketplace
