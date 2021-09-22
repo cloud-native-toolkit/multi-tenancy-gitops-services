@@ -3,3 +3,5 @@ kind: Kustomization
 
 resources:
   - subscription.yaml
+  - operator-shared-pvc.yaml
+  - cp4a-shared-log-pvc.yaml
