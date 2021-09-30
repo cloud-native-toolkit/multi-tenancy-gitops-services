@@ -1,0 +1,11 @@
+apiVersion: cpd.ibm.com/v1
+kind: Ibmcpd
+metadata:
+  name: ibmcpd-cr
+spec:
+  license:
+    accept: true
+    license: Enterprise
+  storageClass: ibmc-file-gold-gid
+  zenCoreMetadbStorageClass: ibmc-file-gold-gid
+  version: "4.0.1"
