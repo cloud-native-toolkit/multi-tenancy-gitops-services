@@ -1,0 +1,14 @@
+global: {}
+
+spp-catalog:
+  catalogs:
+    spp:
+      name: ibm-spp-operator
+      catalog:
+        displayName: IBM SPP Operator
+        image: 'ibmcom/spp-operator-catalog:latest'
+        publisher: IBM
+        sourceType: grpc
+        updateStrategy:
+          registryPoll:
+            interval: 45m
