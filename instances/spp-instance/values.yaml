@@ -121,3 +121,6 @@ spp-instance:
       tls_secret: spp-tls
       usesameregistryforredhat: false
       version: 10.1.8.4124
+  sppadmin:
+    data:
+      adminPassword: REPLACE
