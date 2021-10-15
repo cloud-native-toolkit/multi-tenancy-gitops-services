@@ -1,0 +1,50 @@
+global: {}
+
+argocd-hook-job:
+  name: spp-postsync
+  namespace: spp
+  hook:
+    enabled: true
+    hooktype: PostSync
+  hookdeletepolicy:
+    enabled: true
+    hookdeletepolicytype: HookSucceeded
+  serviceaccount: ibm-spp
+  roleaccess:
+    - verbs:
+        - get
+        - list
+      apiGroups:
+        - ""
+      resources:
+        - pod
+  init:
+    enabled: true
+    image: "quay.io/ibmgaragecloud/helm-kubectl"
+    tag: "3.2.3"
+    command: "bash"
+    args:
+      - "-c"
+      - |
+        sppok=$(kubectl get pod -n spp --no-headers 2>/dev/null | grep sppvirgo | grep Running | grep '1/1' | wc -l)
+        until [ $sppok -eq 1 ]; do
+          sleep 30
+          sppok=$(kubectl get pod -n spp --no-headers 2>/dev/null | grep sppvirgo | grep Running | grep '1/1' | wc -l)
+          now=$(date)
+          echo "${now} - Waiting for sppvirgo - ${sppok}"
+        done
+  container:
+    image: "quay.io/ibmgaragecloud/helm-kubectl"
+    tag: "3.2.3"
+    command: "bash"
+    args:
+      - "-c"
+      - |
+        ok=$(kubectl get configmap sppuser-done -n spp 2>/dev/null | grep sppuser-done | wc -l)
+        if [[ "$ok" -eq 0 ]]; then
+          changeUser="{\"newPassword\":\"ADMINPW\",\"oldUsername\":\"admin\",\"newUsername\":\"ADMINUSER\"}"
+          SPPsession=$(curl "http://sppproxy/api/endeavour/session?changePassword=true" -H 'Accept: application/json' -H 'Content-Type: application/json' -u "admin:password"  --data-raw "${changeUser}")
+          now=$(date)
+          echo "${now} - SPP session: "${SPPsession}
+          kubectl create configmap -n spp sppuser-done --form-literal creationID=${SPPsession}
+        fi
