@@ -7,4 +7,4 @@ appVersion: "1.0"
 dependencies:
   - name: spp-catalog
     version: 0.1
-    repository: https://vbudi000.github.io/toolkit-charts/stable/
+    repository: https://charts.cloudnativetoolkit.dev

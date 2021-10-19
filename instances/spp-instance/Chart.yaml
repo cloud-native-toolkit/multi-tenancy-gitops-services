@@ -7,7 +7,7 @@ appVersion: 10.1.8.2
 dependencies:
   - name: spp-instance
     version: 0.1.0
-    repository: https://vbudi000.github.io/toolkit-charts/stable/
+    repository: https://charts.cloudnativetoolkit.dev
   - name: argocd-hook-job
     version: 0.1.4
     repository: https://charts.cloudnativetoolkit.dev
