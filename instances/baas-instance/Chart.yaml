@@ -1,0 +1,13 @@
+apiVersion: v2
+name: baas
+description: Backup as a Service - Spectrum Protect Plus Container backup support
+type: application
+version: 0.1.0
+appVersion: 10.1.8.2
+dependencies:
+  - name: baas-supplemental
+    version: 0.1.0
+    repository: https://charts.cloudnativetoolkit.dev
+  - name: ibm-spectrum-protect-plus-prod 
+    version: 1.2.2
+    repository: https://raw.githubusercontent.com/IBM/charts/master/repo/ibm-helm

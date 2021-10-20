@@ -1,0 +1,16 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: ibm-spp-operator
+  namespace: openshift-marketplace
+spec:
+  displayName: IBM SPP Operator
+  image: 'ibmcom/spp-operator-catalog:latest'
+  publisher: IBM
+  secrets:
+    - ibmspp-image-secret
+  sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 45m

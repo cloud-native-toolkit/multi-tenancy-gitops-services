@@ -1,0 +1,13 @@
+global: {}
+
+spp-operator:
+  subscriptions:
+    subscription:
+      channel: v10.18
+      installPlanApproval: Automatic
+      name: spp-operator
+      source: ibm-spp-operator
+      sourceNamespace: openshift-marketplace
+    operatorgroup:
+      name: spp-operatorgroup
+      namespace: spp
