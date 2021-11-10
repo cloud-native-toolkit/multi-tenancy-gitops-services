@@ -1,0 +1,11 @@
+ibm-cp4d-watson-studio-instance:
+  metadata:
+    name: ws-cr
+
+  spec:
+    docker_registry_prefix: cp.icr.io/cp/cpd
+    license:
+      accept: "true"
+      license: Enterprise
+    version: 4.0.1
+    storageClass: managed-nfs-storage
