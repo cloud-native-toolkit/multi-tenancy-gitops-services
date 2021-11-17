@@ -37,6 +37,6 @@ robot-shop:
 
   # Storage class to use with redis statefulset.
   redis:
-    storageClassName: managed-nfs-storage
+    storageClassName: ibmc-file-silver-gid
 
   ocCreateRoute: true
