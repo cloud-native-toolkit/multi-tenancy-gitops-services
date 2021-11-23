@@ -21,8 +21,8 @@ robot-shop:
   # EUM configuration
   # Provide your key and set the endpoint
   eum:
-    key: HrCYfudaR6uB-m70rCoomw
-    url: http://52.116.51.73:2999/
+    key: qUMhYJxjSv6uZh2SyqTEnw
+    url: https://ec2-3-22-248-37.us-east-2.compute.amazonaws.com
     #url: https://eum-eu-west-1.instana.io
     #url: https://eum-us-west-2.instana.io
 
