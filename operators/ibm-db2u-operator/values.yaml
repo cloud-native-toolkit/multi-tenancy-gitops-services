@@ -1,0 +1,12 @@
+global: {}
+
+ibm-db2u-operator:
+  subscriptions:
+    ibmdb2u:
+      name: ibm-db2u
+      subscription:
+        channel: v1.1
+        installPlanApproval: Automatic
+        name: db2u-operator
+        source: ibm-db2uoperator-catalog
+        sourceNamespace: openshift-marketplace
