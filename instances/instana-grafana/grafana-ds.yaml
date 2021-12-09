@@ -1,0 +1,23 @@
+# Grafana Data Sources created via the Grafana Operator (v4.1) aren't compatible with Instana Data Sources currently Dec 9, 2021.
+# TODO: Link Feature Request Issue
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDataSource
+metadata:
+  name: instana-datasource
+spec:
+  datasources:
+  - name: instana
+    type: instana-datasource
+    access: direct
+    url: ${INSTANA_UI_BACKEND_URL}
+    jsonData:
+    # GrafanaDataSource currently doesn't support the below fields, so we edit the configmap directly
+      url: ${INSTANA_UI_BACKEND_URL}
+      apiToken: ${INSTANA_API_TOKEN}
+      useProxy: false
+      showOffline: true
+      allowInfraExplore: true
+    isDefault: true
+    version: 1
+    editable: false    
+  name: grafana-ds.yaml

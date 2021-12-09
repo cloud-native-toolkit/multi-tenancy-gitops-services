@@ -1,0 +1,16 @@
+apiVersion: integreatly.org/v1alpha1
+kind: Grafana
+metadata:
+  name: instana-grafana
+spec:
+  config: {}
+  deployment:
+    env:
+    # GF_INSTALL_PLUGINS is used to name the plugins to be installed
+    # <plugin-name> <plugin-version> is the appropriate syntax
+      - name: GF_INSTALL_PLUGINS
+        value: instana-datasource 3.3.1
+  # Create Route (OpenShift) / Ingress (Kubernetes)
+  ingress:
+    enabled: true
+    tlsEnabled: false
