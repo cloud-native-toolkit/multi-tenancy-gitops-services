@@ -1,0 +1,16 @@
+ibm-cp4d-wml-instance:
+  metadata:
+    name: wml-cr
+    labels:
+    app.kubernetes.io/instance: wml-cr
+    app.kubernetes.io/managed-by: ibm-cpd-wml-operator
+    app.kubernetes.io/name: ibm-cpd-wml-operator
+  spec:
+    docker_registry_prefix: cp.icr.io/cp/cpd
+    ignoreForMaintenance: false
+    scaleConfig: medium
+    license:
+      accept: "true"
+      license: Enterprise
+    version: 4.0.1
+    storageClass: managed-nfs-storage
