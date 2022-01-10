@@ -5,7 +5,7 @@ grafana-operator:
     grafana:
       name: grafana-operator
       subscription:
-        channel: alpha
+        channel: v4
         installPlanApproval: Automatic
         name: grafana-operator
         source: community-operators
