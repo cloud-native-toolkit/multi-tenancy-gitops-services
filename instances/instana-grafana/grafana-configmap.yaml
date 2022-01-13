@@ -3,19 +3,22 @@ apiVersion: v1
 metadata:
   name: grafana-datasources
 data:
-  grafana-instana_instana-datasource.yaml: |
+  tools_instana-ds.yaml: |
     apiVersion: 1
+    # deleteDatasources:
+    # - name: instana
     datasources:
     - access: direct
-      editable: true
       isDefault: true
       jsonData:
-        url: <INSTANA_URL>
-        apiToken: <INSTANA_API_TOKEN>
-        useProxy: false
         tracesToLogs: {}
+        url: $INSTANA_URL
+        apiToken: $API_TOKEN
+        useProxy: false
+        showOffline: true
+        allowInfraExplore: true
       name: instana
       secureJsonData: {}
       type: instana-datasource
-      url: <INSTANA_URL>
+      url: $INSTANA_URL
       version: 1
