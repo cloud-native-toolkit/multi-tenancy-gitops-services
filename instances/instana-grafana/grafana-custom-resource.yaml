@@ -4,7 +4,6 @@ metadata:
   name: grafana-instana
   labels:
     app: grafana
-  namespace: tools
 spec:
   deployment:
     env:
