@@ -41,7 +41,7 @@ spec:
             }
           ]
         },
-        "editable": true,
+        "editable": false,
         "gnetId": null,
         "graphTooltip": 0,
         "links": [],
@@ -344,6 +344,6 @@ spec:
         "timezone": "",
         "title": "Instana Sample",
         "uid": null,
-        "version": 2
+        "version": 1
       }
     }
