@@ -1,0 +1,349 @@
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: instana-dashboard
+  labels:
+    app: grafana
+spec:
+  json: >
+    {
+      "meta": {
+        "type": "db",
+        "canSave": true,
+        "canEdit": true,
+        "canAdmin": true,
+        "canStar": true,
+        "expires": "0001-01-01T00:00:00Z",
+        "created": "2021-12-13T23:22:30Z",
+        "updated": "2021-12-13T23:32:24Z",
+        "updatedBy": "admin",
+        "createdBy": "admin",
+        "version": 2,
+        "hasAcl": false,
+        "isFolder": false,
+        "folderId": 0,
+        "folderTitle": "General",
+        "folderUrl": "",
+        "provisioned": false,
+        "provisionedExternalId": ""
+      },
+      "dashboard": {
+        "annotations": {
+          "list": [
+            {
+              "builtIn": 1,
+              "datasource": "-- Grafana --",
+              "enable": true,
+              "hide": true,
+              "iconColor": "rgba(0, 211, 255, 1)",
+              "name": "Annotations \u0026 Alerts",
+              "type": "dashboard"
+            }
+          ]
+        },
+        "editable": false,
+        "gnetId": null,
+        "graphTooltip": 0,
+        "links": [],
+        "panels": [
+          {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": null,
+            "fieldConfig": { "defaults": {}, "overrides": [] },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 },
+            "hiddenSeries": false,
+            "id": 6,
+            "legend": {
+              "avg": false,
+              "current": false,
+              "max": false,
+              "min": false,
+              "show": true,
+              "total": false,
+              "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": { "alertThreshold": true },
+            "percentage": false,
+            "pluginVersion": "7.5.11",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "aggregation": { "key": "MEAN", "label": "MEAN" },
+                "aggregationFunction": { "label": "SUM" },
+                "allMetrics": [],
+                "customFilters": [],
+                "entityQuery": "host",
+                "entityType": { "key": "host", "label": "Host" },
+                "metric": {
+                  "aggregations": [
+                    { "key": "MEAN", "label": "MEAN" },
+                    { "key": "SUM", "label": "SUM" }
+                  ],
+                  "description": "tcp.inSegs",
+                  "entityType": "host",
+                  "key": "tcp.inSegs",
+                  "label": "TCP In Segments/s"
+                },
+                "metricCategory": {
+                  "key": 0,
+                  "label": "Infrastructure built-in metrics"
+                },
+                "refId": "A",
+                "showAllMetrics": false,
+                "timeInterval": { "key": "60000", "label": "1min" },
+                "timeShiftIsValid": true
+              }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "TCP In Segments/s",
+            "tooltip": { "shared": true, "sort": 0, "value_type": "individual" },
+            "type": "graph",
+            "xaxis": {
+              "buckets": null,
+              "mode": "time",
+              "name": null,
+              "show": true,
+              "values": []
+            },
+            "yaxes": [
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              }
+            ],
+            "yaxis": { "align": false, "alignLevel": null }
+          },
+          {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": null,
+            "fieldConfig": { "defaults": {}, "overrides": [] },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": { "h": 9, "w": 12, "x": 12, "y": 0 },
+            "hiddenSeries": false,
+            "id": 2,
+            "legend": {
+              "avg": false,
+              "current": false,
+              "max": false,
+              "min": false,
+              "show": true,
+              "total": false,
+              "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": { "alertThreshold": true },
+            "percentage": false,
+            "pluginVersion": "7.5.11",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "aggregation": { "key": "MEAN", "label": "MEAN" },
+                "aggregationFunction": { "label": "SUM" },
+                "allMetrics": [],
+                "customFilters": [],
+                "entityQuery": "host",
+                "entityType": { "key": "host", "label": "Host" },
+                "metric": {
+                  "aggregations": [
+                    { "key": "MEAN", "label": "MEAN" },
+                    { "key": "SUM", "label": "SUM" }
+                  ],
+                  "description": "cpu.nice",
+                  "entityType": "host",
+                  "key": "cpu.nice",
+                  "label": "CPU nice usage"
+                },
+                "metricCategory": {
+                  "key": 0,
+                  "label": "Infrastructure built-in metrics"
+                },
+                "refId": "A",
+                "showAllMetrics": false,
+                "timeInterval": { "key": "60000", "label": "1min" },
+                "timeShiftIsValid": true
+              }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "CPU Nice Usage",
+            "tooltip": { "shared": true, "sort": 0, "value_type": "individual" },
+            "type": "graph",
+            "xaxis": {
+              "buckets": null,
+              "mode": "time",
+              "name": null,
+              "show": true,
+              "values": []
+            },
+            "yaxes": [
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              }
+            ],
+            "yaxis": { "align": false, "alignLevel": null }
+          },
+          {
+            "aliasColors": {},
+            "bars": false,
+            "dashLength": 10,
+            "dashes": false,
+            "datasource": null,
+            "fieldConfig": { "defaults": {}, "overrides": [] },
+            "fill": 1,
+            "fillGradient": 0,
+            "gridPos": { "h": 9, "w": 12, "x": 0, "y": 9 },
+            "hiddenSeries": false,
+            "id": 4,
+            "legend": {
+              "avg": false,
+              "current": false,
+              "max": false,
+              "min": false,
+              "show": true,
+              "total": false,
+              "values": false
+            },
+            "lines": true,
+            "linewidth": 1,
+            "nullPointMode": "null",
+            "options": { "alertThreshold": true },
+            "percentage": false,
+            "pluginVersion": "7.5.11",
+            "pointradius": 2,
+            "points": false,
+            "renderer": "flot",
+            "seriesOverrides": [],
+            "spaceLength": 10,
+            "stack": false,
+            "steppedLine": false,
+            "targets": [
+              {
+                "aggregation": { "key": "MEAN", "label": "MEAN" },
+                "aggregationFunction": { "label": "SUM" },
+                "allMetrics": [],
+                "customFilters": [],
+                "entityQuery": "host",
+                "entityType": { "key": "host", "label": "Host" },
+                "metric": {
+                  "aggregations": [
+                    { "key": "MEAN", "label": "MEAN" },
+                    { "key": "SUM", "label": "SUM" }
+                  ],
+                  "description": "cpu.sys",
+                  "entityType": "host",
+                  "key": "cpu.sys",
+                  "label": "CPU system usage"
+                },
+                "metricCategory": {
+                  "key": 0,
+                  "label": "Infrastructure built-in metrics"
+                },
+                "refId": "A",
+                "showAllMetrics": false,
+                "timeInterval": { "key": "60000", "label": "1min" },
+                "timeShiftIsValid": true
+              }
+            ],
+            "thresholds": [],
+            "timeFrom": null,
+            "timeRegions": [],
+            "timeShift": null,
+            "title": "CPU System Usage",
+            "tooltip": { "shared": true, "sort": 0, "value_type": "individual" },
+            "type": "graph",
+            "xaxis": {
+              "buckets": null,
+              "mode": "time",
+              "name": null,
+              "show": true,
+              "values": []
+            },
+            "yaxes": [
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              },
+              {
+                "format": "short",
+                "label": null,
+                "logBase": 1,
+                "max": null,
+                "min": null,
+                "show": true
+              }
+            ],
+            "yaxis": { "align": false, "alignLevel": null }
+          }
+        ],
+        "schemaVersion": 27,
+        "style": "dark",
+        "tags": [],
+        "templating": { "list": [] },
+        "time": { "from": "now-6h", "to": "now" },
+        "timepicker": {},
+        "timezone": "",
+        "title": "Instana Sample",
+        "uid": null,
+        "version": 1
+      }
+    }

@@ -1,0 +1,24 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: grafana-datasources
+data:
+  tools_instana-datasource.yaml: |
+    apiVersion: 1
+    # deleteDatasources:
+    # - name: instana
+    datasources:
+    - access: direct
+      isDefault: true
+      jsonData:
+        tracesToLogs: {}
+        url: $INSTANA_URL
+        apiToken: $API_TOKEN
+        useProxy: false
+        showOffline: true
+        allowInfraExplore: true
+      name: instana
+      secureJsonData: {}
+      type: instana-datasource
+      url: $INSTANA_URL
+      version: 1

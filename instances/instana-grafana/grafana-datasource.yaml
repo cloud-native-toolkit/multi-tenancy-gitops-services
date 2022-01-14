@@ -1,0 +1,15 @@
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDataSource
+metadata:
+  name: instana-datasource
+spec:
+  datasources:
+  - name: instana
+    type: instana-datasource
+    access: direct
+    url: $INSTANA_URL
+    jsonData: {}
+    isDefault: true
+    version: 1
+    editable: false    
+  name: instana-datasource.yaml 
