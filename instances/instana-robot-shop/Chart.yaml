@@ -5,9 +5,9 @@ appVersion: 1.16.0
 description: Instana Robot Shop
 dependencies:
   - name: service-account
-    version: 0.5.0
+    version: 0.6.1
     repository: https://charts.cloudnativetoolkit.dev
   - name: robot-shop
-    version: 1.1.0
+    version: 1.1.1
     repository: https://charts.cloudnativetoolkit.dev
 
