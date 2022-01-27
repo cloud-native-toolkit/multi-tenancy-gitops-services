@@ -11,38 +11,29 @@ robot-shop:
     repo: robotshop
     version: latest
     pullPolicy: IfNotPresent
-
   # Alternative payment gateway URL
   # Default is https://www.paypal.com
   payment:
     gateway: null
     #gateway: https://www.worldpay.com
-
   # EUM configuration
   # Provide your key and set the endpoint
-
   eum:
     # eum.key is the secret token used to authenticate to Instana's server.
     # key:
-
     # Rather than explicitly specifying the key, you can "bring your own secret" creating it in
     # the namespace in which you deploy "robot-shop" and specify the name in the "keysSecret" field.
     # The secret you create must contain a field called 'key' which contains the value you'd set in `.eum.key`.
     keysSecret:
     url:
-
   # Pod Security Policy
   psp:
     enabled: false
-
   # For the mini ones minikube, minishift set to true
   nodeport: false
-
   # "special" Openshift. Set to true when deploying to any openshift flavour
   openshift: true
-
   # Storage class to use with redis statefulset.
   redis:
     storageClassName: ibmc-file-silver-gid
-
   ocCreateRoute: true
