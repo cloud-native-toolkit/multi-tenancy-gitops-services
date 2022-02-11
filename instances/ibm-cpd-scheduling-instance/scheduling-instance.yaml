@@ -1,0 +1,13 @@
+apiVersion: scheduler.spectrumcomputing.ibm.com/v1
+kind: Scheduling
+metadata:
+  labels:
+    release: cpd-scheduler
+    velero.io/exclude-from-backup: "true"
+  name: ibm-cpd-scheduler
+spec:
+  version: 1.3.1
+  license:
+    accept: true
+  registry: cp.icr.io/cp/cpd
+  releasename: ibm-cpd-scheduler
