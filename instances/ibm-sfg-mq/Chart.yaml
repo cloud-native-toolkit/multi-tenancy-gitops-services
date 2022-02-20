@@ -1,0 +1,12 @@
+apiVersion: v2
+name: ibm-sfg-mq
+version: 0.1.6
+appVersion: "1.16.0"
+description: CNTK - IBM MQ for SFG
+dependencies:
+  - name: service-account
+    version: 0.5.0
+    repository: https://charts.cloudnativetoolkit.dev
+  - name: ibm-sfg-mq
+    version: 0.1.4
+    repository: https://hollisc.github.io/gitops-testing

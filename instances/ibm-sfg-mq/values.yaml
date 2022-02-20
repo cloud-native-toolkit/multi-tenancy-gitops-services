@@ -1,0 +1,15 @@
+global: {}
+service-account:
+  name: mq
+  create: false
+  sccs: ["privileged"]
+
+ibm-sfg-mq:
+  name: mq
+  replicaCount: 1
+  serviceName: mq
+  serviceAccount: mq
+  image:
+    repository: nginx
+    pullPolicy: IfNotPresent
+  storageClassName: ibmc-block-gold

@@ -1,0 +1,15 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: sterlingb2bitoolkit-pv
+  labels:
+    failure-domain.beta.kubernetes.io/region: ${METADATA_LABELS_REGION}
+    failure-domain.beta.kubernetes.io/zone: $METADATA_LABELS_ZONE
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: ${NFS_SERVER_STERLING}
+    path: ${NFS_PATH_STERLING}

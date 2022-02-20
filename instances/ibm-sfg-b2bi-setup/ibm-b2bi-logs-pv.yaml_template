@@ -1,0 +1,17 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "270"
+  name: logs
+  labels:
+    intent: logs
+spec:
+  storageClassName: "ibmc-file-gold"
+  capacity:
+    storage: 500Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: ${NFS_SERVER_LOGS}
+    path: ${NFS_PATH_LOGS}

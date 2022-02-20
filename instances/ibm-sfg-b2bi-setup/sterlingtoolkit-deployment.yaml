@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "278"
+  name: sterlingtoolkit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sterlingtoolkit
+  template:
+    metadata:
+      labels:
+        app: sterlingtoolkit
+    spec:
+      containers:
+      - name: sterlingtoolkit
+        image: quay.io/hollisc/sterlingtoolkit:1.0.6
+        command: ["/bin/bash", "-ce", "cp /temp/db2jcc4.jar /var/nfs-data/resources/ && tail -f /dev/null"]
+        volumeMounts:
+        - mountPath: /var/nfs-data/resources
+          name: volume
+          subPath: resources
+        - mountPath: /var/nfs-data/documents
+          name: volume
+          subPath: documents
+        - mountPath: /var/nfs-data/logs
+          name: volume
+          subPath: logs
+      volumes:
+      - name: volume
+        persistentVolumeClaim:
+          claimName: sterlingb2bitoolkit-pvc
