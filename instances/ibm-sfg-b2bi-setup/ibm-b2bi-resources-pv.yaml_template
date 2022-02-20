@@ -1,0 +1,17 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "270"
+  name: resources
+  labels:
+    intent: resources
+spec:
+  storageClassName: "ibmc-file-gold"
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadOnlyMany
+  nfs:
+    server: ${NFS_SERVER_RES}
+    path: ${NFS_PATH_RES}
