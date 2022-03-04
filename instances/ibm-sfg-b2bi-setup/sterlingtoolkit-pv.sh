@@ -15,9 +15,9 @@ if [[ -z ${PVC_NAME} ]]; then
   exit 1
 fi
 # working on zone & reigion  - to do improvment
-METADATA_LABELS_REGION=$(oc get pv ${PVC_NAME} -o jsonpath='{ .spec.nodeAffinity.required.nodeSelectorTerms[0].matchExpressions[1].values}' | tr -d '[""]')
+METADATA_LABELS_REGION=$(oc get pv ${PVC_NAME} -o jsonpath='{ .metadata.labels.failure-domain\.beta\.kubernetes\.io\/region }')
 
-METADATA_LABELS_ZONE=$(oc get pv ${PVC_NAME} -o jsonpath='{ .metadata.labels.Datacenter}')
+METADATA_LABELS_ZONE=$(oc get pv ${PVC_NAME} -o jsonpath='{ .metadata.labels.failure-domain\.beta\.kubernetes\.io\/zone }')
 
 # -------- ----- -----
 NFS_SERVER_STERLING=$(oc get pv ${PVC_NAME} -o jsonpath='{ .spec.nfs.server}')
