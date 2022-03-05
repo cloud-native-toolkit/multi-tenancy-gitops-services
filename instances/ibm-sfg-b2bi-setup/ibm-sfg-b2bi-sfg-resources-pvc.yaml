@@ -1,0 +1,28 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "275"
+  name: ibm-sfg-b2bi-sfg-resources
+  # labels:
+  #   app.kubernetes.io/component: resources
+  #   app.kubernetes.io/instance: ibm-sfg-b2bi
+  #   app.kubernetes.io/managed-by: Helm
+  #   app.kubernetes.io/name: sfg
+  #   helm.sh/chart: ibm-sfg-prod
+  #   release: ibm-sfg-b2bi
+spec:
+  accessModes:
+    - ReadOnlyMany
+  selector:
+    matchExpressions:
+      - key: intent
+        operator: In
+        values:
+          - resources
+  resources:
+    requests:
+      storage: 100Mi
+  volumeName: resources
+  storageClassName: ibmc-file-gold
+  volumeMode: Filesystem
