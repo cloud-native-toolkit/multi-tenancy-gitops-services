@@ -1,0 +1,10 @@
+ibm-cpd-ds-instance:
+  metadata:
+    name: datastage-cr
+
+  spec:
+    license:
+      accept: "true"
+      license: Enterprise
+    version: "4.0.5"
+    storageClass: managed-nfs-storage
