@@ -8,9 +8,9 @@ ibm-sfg-prod:
     image:
       repository: ${SFG_REPO}
     # Provide the tag value in double quotes
-      tag: ${SFG_TAG} 
+      tag: ${SFG_TAG}
       pullPolicy: IfNotPresent
-      pullSecret: ${SFG_PULLSECRECT}  
+      pullSecret: ${SFG_PULLSECRECT}
   serviceAccount:
     create: false
     name: b2bi
@@ -32,7 +32,7 @@ ibm-sfg-prod:
     accessMode: ReadWriteMany
     size: 500Mi
   appDocumentsPVC:
-    enabled: ${APP_DOCUMENTS_PVC_ENABLED} 
+    enabled: ${APP_DOCUMENTS_PVC_ENABLED}
     name: documents
     storageClassName: "ibmc-file-gold"
     selector:
@@ -101,6 +101,21 @@ ibm-sfg-prod:
     #SANDBOX_WEBAPP_LIST_PORT: 5001
   asi:
     replicaCount: 1
+
+    resources:
+      limits:
+        cpu: 4000m
+        memory: 8Gi
+      requests:
+        cpu: 2000m
+        memory: 4Gi
+
+    autoscaling:
+      enabled: false
+      minReplicas: 2
+      maxReplicas: 4
+      targetCPUUtilizationPercentage: 60
+
     frontendService:
       type: ClusterIP
       ports:
@@ -162,6 +177,20 @@ ibm-sfg-prod:
         #    enableHttps: false
   ac:
     replicaCount: 1
+    resources:
+      limits:
+        cpu: 4000m
+        memory: 8Gi
+      requests:
+        cpu: 2000m
+        memory: 4Gi
+
+    autoscaling:
+      enabled: false
+      minReplicas: 2
+      maxReplicas: 4
+      targetCPUUtilizationPercentage: 60
+
     frontendService:
       type: ClusterIP
       ports:
