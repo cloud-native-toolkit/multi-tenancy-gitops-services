@@ -17,27 +17,18 @@ ibm-sfg-prod:
   appResourcesPVC:
     enabled: ${APP_RESOURCES_PVC_ENABLED}
     name: resources
-    storageClassName: "ibmc-file-gold"
-    selector:
-      label: "intent"
-      value: "resources"
-    accessMode: ReadOnlyMany
+    storageClassName: ${RWX_STORAGECLASS}
+    accessMode: ReadWriteMany
     size: 100Mi
   appLogsPVC:
     name: logs
-    storageClassName: "ibmc-file-gold"
-    selector:
-      label: "intent"
-      value: "logs"
+    storageClassName: ${RWX_STORAGECLASS}
     accessMode: ReadWriteMany
     size: 500Mi
   appDocumentsPVC:
     enabled: ${APP_DOCUMENTS_PVC_ENABLED}
     name: documents
-    storageClassName: "ibmc-file-gold"
-    selector:
-      label: "intent"
-      value: "documents"
+    storageClassName: ${RWX_STORAGECLASS}
     accessMode: ReadWriteMany
     size: 500Mi
   security:
@@ -151,7 +142,7 @@ ibm-sfg-prod:
         # protocol: TCP
     backendService:
   #    type: NodePort
-      type: LoadBalancer
+      type: ClusterIP
       ports:
       - name: adapter-1
         port: 30201
@@ -207,7 +198,7 @@ ibm-sfg-prod:
         # nodePort: 30200
         # protocol: TCP
     backendService:
-      type: LoadBalancer
+      type: ClusterIP
       ports:
         - name: adapter-1
           port: 30401
