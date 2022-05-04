@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "275"
-  name: ibm-sfg-b2bi-sfg-logs
+  name: ibm-sfg-${NS}-sfg-logs
   # labels:
   #   app.kubernetes.io/component: logs
   #   app.kubernetes.io/instance: ibm-sfg-b2bi

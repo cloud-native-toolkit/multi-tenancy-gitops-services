@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "275"
-  name: ibm-sfg-b2bi-sfg-resources
+  name: ibm-sfg-${NS}-sfg-resources
   # labels:
   #   app.kubernetes.io/component: resources
   #   app.kubernetes.io/instance: ibm-sfg-b2bi
