@@ -4,7 +4,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "275"
-  name: "ibm-b2bi-scc"
+  name: "ibm-b2bi-scc-b2bi-nonprod"
   labels:
     app: "ibm-b2bi-scc"
 roleRef:
@@ -15,4 +15,4 @@ subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
   name: system:serviceaccounts
-  namespace: b2bi
+  namespace: b2bi-nonprod

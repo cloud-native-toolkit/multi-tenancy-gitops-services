@@ -15,4 +15,4 @@ subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
   name: system:serviceaccounts
-  namespace: b2bi
+  namespace: b2bi-prod
