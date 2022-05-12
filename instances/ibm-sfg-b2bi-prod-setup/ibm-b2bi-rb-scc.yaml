@@ -12,7 +12,23 @@ roleRef:
   kind: ClusterRole
   name: "ibm-b2bi-scc"
 subjects:
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: system:serviceaccounts
+- kind: ServiceAccount
+  name: b2bi
+  namespace: b2bi-prod
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "275"
+  name: "default-anyuid-prod"
+  labels:
+    app: "ibm-b2bi-scc"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ibm-b2bi-anyuid-scc"
+subjects:
+- kind: ServiceAccount
+  name: default
   namespace: b2bi-prod

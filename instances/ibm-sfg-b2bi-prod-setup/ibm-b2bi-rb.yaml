@@ -12,7 +12,6 @@ roleRef:
   kind: ClusterRole
   name: "ibm-b2bi-psp"
 subjects:
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: system:serviceaccounts
+- kind: ServiceAccount
+  name: b2bi
   namespace: b2bi-prod
