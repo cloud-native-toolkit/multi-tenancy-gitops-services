@@ -67,7 +67,7 @@ ibm-pem-standard-vbudi:
         cpu: "500m"
         ephemeral-storage: "3Gi" #Specify the maximimum ephemeral-storage a pod can utilize
     setupfile:
-      passphrasesecret: ibm-pem-secret
+      passphrasesecret: ${PEM_SECRET}
       migrator:
         default_sponsor: true
       ## For more information about configuring the properties of Setup.cfg file,
@@ -100,7 +100,7 @@ ibm-pem-standard-vbudi:
       db_name: pemdb #Specify the DATABASE Name
       db_schema: DB2INST1 #Specify the Schema name
       db_user: DB2INST1 #Specify the DB username
-      db_password: ibm-pem-secret  #Specify the secret
+      db_password: ${PEM_SECRET}  #Specify the secret
       db_driver: com.ibm.db2.jcc.DB2Driver #Specify the corresponding driver details for oracle or DB2 or mssql depnding on the db_type that is selected. For example, for oracle, set the values of db_driver to oracle.jdbc.OracleDriver. For DB2, set com.ibm.db2.jcc.DB2Driver. For mssql, set com.microsoft.sqlserver.jdbc.SQLServerDriver.
       ## DB CONNECTION MANAGER DETAILS. COMMON FOR IBM PEM, PARTNER REPOSITORY &
       #PARTNER PROVISIONER
@@ -139,7 +139,7 @@ ibm-pem-standard-vbudi:
       testmode_db_schema: DB2INST2 #Specify the Database Schema
       testmode_db_user: DB2INST1 # Specify the databse user name
       #Provide the secret name
-      testmode_db_password: ibm-pem-secret #Provide the secret name
+      testmode_db_password: ${PEM_SECRET} #Provide the secret name
       testmode_db_driver: com.ibm.db2.jcc.DB2Driver #Specify the database driver Name
       ## TESTMODE DB CONNECTION MANAGER DETAILS. COMMON FOR IBM PEM, PARTNER
       #REPOSITORY & PARTNER PROVISIONER
@@ -236,7 +236,7 @@ ibm-pem-standard-vbudi:
         #For example, jvm_options: "-Xms4g -Xmx4g".
         jvm_options: # Specify the list of JVM options for the servers, and separated by space.
 
-        keystore_password: ibm-pem-secret #Specify the secret name
+        keystore_password: ${PEM_SECRET} #Specify the secret name
         keystore_alias: pem #Specify the secret alias
         keystore_filename: ibm-pem.jks #Specify the secret name and key inside secret has to be same as secret name
 
@@ -289,7 +289,7 @@ ibm-pem-standard-vbudi:
         #Repository, and Partner Provisioner. The keystore file (.jks file) has to be
         #copied in the <mount location>/resources/security folder.
         #Provide the secret name
-        keystore_password: ibm-pem-secret #Specify the secret name
+        keystore_password: ${PEM_SECRET} #Specify the secret name
         keystore_alias: pem #Specify the secret alias
         keystore_filename: ibm-pem.jks #Specify the secret name and key inside secret has to be same as secret name
         # The default value is 100 MB.
@@ -358,7 +358,7 @@ ibm-pem-standard-vbudi:
         #For example, jvm_options: "-Xms4g -Xmx4g".
         jvm_options: ## Specify the list of JVM options for the servers, and separated by space.
 
-        keystore_password: ibm-pem-secret #Specify the secret name
+        keystore_password: ${PEM_SECRET} #Specify the secret name
         keystore_alias: pem #Specify the secret alias
         keystore_filename: ibm-pem.jks #Specify the secret name and key inside secret has to be same as secret name
         # The default value is 100 MB.
@@ -542,7 +542,7 @@ ibm-pem-standard-vbudi:
 
         jvm_options: ## Specify the list of JVM options for the servers, and separated by space. For example, jvm_options: "-Xms4g -Xmx4g".
 
-        keystore_password: ibm-pem-secret #Specify the secret name
+        keystore_password: ${PEM_SECRET} #Specify the secret name
         keystore_alias: pem #Specify the secret alias
         keystore_filename: ibm-pem.jks #Specify the secret name and key inside secret has to be same as secret name
 
@@ -582,7 +582,7 @@ ibm-pem-standard-vbudi:
             enabled: true #Application will try to enable SSL if it is true
             key_store: ibm-pem.jks #Application will try to load the key-store from this location if ssl enabled.
             keystoresecret: ibm-pem.jks #secret for keystore
-            key_store_password: ibm-pem-secret #keystorepass_secret
+            key_store_password: ${PEM_SECRET} #keystorepass_secret
             key_store_type: JKS # PKCS12 #Here we need to provide keystore type
           serverHeader: "IBM Partner Engagement Manager Community Manager" #Default server header i,.e IBM Partner Engagement Manager Community Manager
           compression:
@@ -625,7 +625,7 @@ ibm-pem-standard-vbudi:
             host: smtp.hostname.com
             port: 587 #25
             username: UserName@company.com #Specify the username exmaple: username@compnay.com
-            cmks: ibm-pem-secret #Provde the password secret
+            cmks: ${PEM_SECRET} #Provde the password secret
             from: from_mailid@company.com
             app_contact_mail: app_contact_mailid@company.com
             mail_signature: "Community Manager Portal support team."
@@ -681,7 +681,7 @@ ibm-pem-standard-vbudi:
               active: true
               api:
                 username: cm_user
-                cmks: ibm-pem-secret #ENC(KKtUwo6lrp1At7pa/fUn4g==)
+                cmks: ${PEM_SECRET} #ENC(KKtUwo6lrp1At7pa/fUn4g==)
                 baseUrl:
             as2: #true : If AS2 API Available in B2Bi APIs and if you want to use it from CM
               active: false
@@ -708,7 +708,7 @@ ibm-pem-standard-vbudi:
           active: false #if we have SSP APIs enable then make it as true or else false
           api:
             username: ssp_user #User name to authenticate the API
-            cmks: ibm-pem-secret #Password or Secret of the above user
+            cmks: ${PEM_SECRET} #Password or Secret of the above user
             baseUrl: #Provide  Base URL of the SSP API
         adapters: #Profiles Default Adapters Details Configuration
           ftpServerAdapterName: CM_FTPServerAdapter #Specify the respective adapter name
@@ -775,13 +775,13 @@ ibm-pem-standard-vbudi:
           datasource:
             url: jdbc:db2://pemdb.${PEM_NS}.svc:50000/PEMDB #Datbase url example jdbc::thin:@DBHostname:1521/DBName
             username: DB2INST1 #Specify the database username
-            cmks: ibm-pem-secret #Provide the sceret name
+            cmks: ${PEM_SECRET} #Provide the sceret name
             driver_class_name: com.ibm.db2.jcc.DB2Driver #Provide db driver class name Ex: .jdbc.driver.
           api_ws:
             active: true
             base_url: #specify the url
             username: PEMUsername
-            cmks: ibm-pem-secret #specify the secret name
+            cmks: ${PEM_SECRET} #specify the secret name
         file:
           archive:
             scheduler:
@@ -888,7 +888,7 @@ ibm-pem-standard-vbudi:
             enabled: true #Application will try to enable SSL if it is true
             key_store: ibm-pem.jks #Application will try to load the key-store from this location if ssl enabled.
             keystoresecret: ibm-pem.jks #secret for keystore
-            key_store_password: ibm-pem-secret #keystorepass_secret
+            key_store_password: ${PEM_SECRET} #keystorepass_secret
             key_store_type: JKS # PKCS12 #Here we need to provide keystore type
           serverHeader: "IBM Partner Engagement Manager Community Manager" #Default server header i,.e IBM Partner Engagement Manager Community Manager
           compression:
@@ -931,7 +931,7 @@ ibm-pem-standard-vbudi:
             host: smtp.hostname.com
             port: 587 #25
             username: UserName@company.com #Specify the username exmaple: username@compnay.com
-            cmks: ibm-pem-secret #Provde the password secret
+            cmks: ${PEM_SECRET} #Provde the password secret
             from: from_mailid@company.com
             app_contact_mail: app_contact_mailid@company.com
             mail_signature: "Community Manager Portal support team."
@@ -987,7 +987,7 @@ ibm-pem-standard-vbudi:
               active: true
               api:
                 username: cm_user
-                cmks: ibm-pem-secret #ENC(KKtUwo6lrp1At7pa/fUn4g==)
+                cmks: ${PEM_SECRET} #ENC(KKtUwo6lrp1At7pa/fUn4g==)
                 baseUrl:
             as2: #true : If AS2 API Available in B2Bi APIs and if you want to use it from CM
               active: false
@@ -1014,7 +1014,7 @@ ibm-pem-standard-vbudi:
           active: false #if we have SSP APIs enable then make it as true or else false
           api:
             username: ssp_user #User name to authenticate the API
-            cmks: ibm-pem-secret #Password or Secret of the above user
+            cmks: ${PEM_SECRET} #Password or Secret of the above user
             baseUrl: #Provide  Base URL of the SSP API
         adapters: #Profiles Default Adapters Details Configuration
           ftpServerAdapterName: CM_FTPServerAdapter #Specify the respective adapter name
@@ -1081,13 +1081,13 @@ ibm-pem-standard-vbudi:
           datasource:
             url: jdbc:db2://pemdb.${PEM_NS}.svc:50000/PEMDB #Datbase url example jdbc::thin:@DBHostname:1521/DBName
             username: DB2INST1 #Specify the database username
-            cmks: ibm-pem-secret #Provide the sceret name
+            cmks: ${PEM_SECRET} #Provide the sceret name
             driver_class_name: com.ibm.db2.jcc.DB2Driver #Provide db driver class name Ex: .jdbc.driver.
           api_ws:
             active: true
             base_url: #specify the url
             username: PEMUsername
-            cmks: ibm-pem-secret #specify the secret name
+            cmks: ${PEM_SECRET} #specify the secret name
         file:
           archive:
             scheduler:
