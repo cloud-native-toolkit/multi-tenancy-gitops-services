@@ -1,0 +1,14 @@
+# Source: ibm-pem-standard-prod/templates/resource-pvc.yml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ibm-pem-resources-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100Mi
+  storageClassName: ${RWX_STORAGECLASS}
+

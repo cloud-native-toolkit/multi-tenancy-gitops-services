@@ -1,0 +1,1184 @@
+service-account:
+  name: pem
+  create: false
+  sccs: ["anyuid"]
+
+ibm-pem-standard-vbudi:
+  image:
+    name: "cp.icr.io/cp/ibm-pem/pem" #Provide the value in double quotes
+    tag: "${PEM_VERSION}" #Specify the tag name
+    pullPolicy: IfNotPresent
+    pullSecret: "ibm-entitlement-key" #Provide the pull secret name
+
+  arch: amd64
+  license: true
+
+  serviceAccountName: pem #specify the service account name which has required permissions
+  timezone:
+    configmapname: pemtz #specify the timezone configmap
+  volumeClaims:
+    resources:
+        enabled: true #if enabled persistent volume will be used
+        capacity: 100Mi
+        storageclass: ${RWX_STORAGECLASS}
+        subpath:
+          dbdrivers: dbdrivers #specify the directory for dbdrivers inside a persistent volume for resources with required permissions
+          wmq: wmq #specify the directory for wmq jars inside a persistent volume for resources with required permissions
+          sso: sso #specify the directory for sso jars inside a persistent volume for resources with required permissions
+          ssomigrator: ssomigrator #specify the directory for ssomigrator data files inside a persistent volume for resources with required permissions
+          pcm: pcm #specify the directory for pcm jars inside a persistent volume for resources with required permissions
+    logs:
+        enabled: false #Specify the values to true or false based on requriement
+        enableAppLogOnConsole: true
+        subpath:
+          migrator: migrator #specify the directory for migrator logs inside a persistent volume for logs with required permissions
+          dbutils: dbutil #specify the directory for dbutils logs inside a persistent volume for logs with required permissions
+          pem: pem #specify the directory for pem logs inside a persistent volume for logs with required permissions
+          pp: pp #specify the directory for pp logs inside a persistent volume for logs with required permissions
+          pr: pr #specify the directory for pr logs inside a persistent volume for logs with required permissions
+          apigateway: apigateway #specify the directory for apigateway logs inside a persistent volume for logs with required permissions
+          ssoMigrator: ssomigration #specify the directory for ssoMigrator logs inside a persistent volume for logs with required permissions
+          purge: purge #specify the directory for purge logs inside a persistent volume for logs with required permissions
+          agent: agent #specify the directory for agent logs inside a persistent volume for logs with required permissions
+          pcmProd: PCM_prod #specify the directory for pcmProd logs inside a persistent volume for logs with required permissions
+          pcmNonProd: PCM_nonProd #specify the directory for pcmNonProd logs inside a persistent volume for logs with required permissions
+        capacity: 1Gi
+        storageclass: ${RWX_STORAGECLASS}
+        accessModes:
+          - ReadWriteMany
+  test:
+    image:
+      repository: 'cp.icr.io/cp'
+      name: 'opencontent-common-utils'
+      tag: '1.1.11'
+      pullPolicy: 'IfNotPresent'
+      pullSecret: "ibm-entitlement-key"
+
+  dbsetup:
+    enabled: true  #If it is first installation specify the values true
+    upgrade: false #If it is upgrade Specify the values to true
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "250m"
+        ephemeral-storage: "2Gi" #Specify the ephemeral-storage request as needed
+      limits:
+        memory: "4Gi"
+        cpu: "500m"
+        ephemeral-storage: "3Gi" #Specify the maximimum ephemeral-storage a pod can utilize
+    setupfile:
+      passphrasesecret: ${PEM_SECRET}
+      migrator:
+        default_sponsor: true
+      ## For more information about configuring the properties of Setup.cfg file,
+      #refer to
+      #http://www.ibm.com/support/knowledgecenter/SSKPRS/com.ibm.help.pem.local.doc/r_setup_cfg_file_properties.html
+      ## LICENSE
+      ## Setting this value to true enables you to accept the licenses and start
+      #the docker container. Valid values are true and false.
+      accept_license: true #Valid values are true or false
+      ## SUBSCRIPTION MONITOR
+      ## Specify the host and the port details for proxy server, which enables you
+      #to connect to the subscription monitor.
+      # proxy_host: #Provide your network's forward proxy machine's host name or IP.
+      # proxy_port: #Provide your network's forward proxy's port.
+      # proxy_user_name: #Provide your network's forward proxy's user name. If the proxy does not require authentication, leave the field blank.
+
+      # proxy_password: #Provide the secret name
+      # proxy_protocol:
+      customer_id: ${CUSTOMER_ID} ## Specify the customer ID. Ensure that the customer ID that you specify matches with your Bluemix ID that you have registered to download IBM PEM image
+      ## DATABASE AND SSL PROPERTIES THAT ARE COMMON TO ALL THE APPLICATIONS
+      db_type: DB2 #Specify the database type which you are using either DB2 or Oracle or mssql.
+      ## Enable or disable the SSL connection for master and testmode database
+      #schemas. Valid values are true and false and the default value is set to
+      #false.
+      ssl_connection: false #Set the value to true if your using SSL connection between the application servers and database
+      # Specify the database details for the master schema.
+      #These propertiesenable you to start the following pods: IBM PEM, PartnerRepository, Partner Provisioner, Purge, Migrator,and DBUtils. ,
+      db_port: 50000 #specify the port
+      db_host: pemdb.${PEM_NS}.svc #specify the host
+      db_name: pemdb #Specify the DATABASE Name
+      db_schema: DB2INST1 #Specify the Schema name
+      db_user: DB2INST1 #Specify the DB username
+      db_password: ${PEM_SECRET}  #Specify the secret
+      db_driver: com.ibm.db2.jcc.DB2Driver #Specify the corresponding driver details for oracle or DB2 or mssql depnding on the db_type that is selected. For example, for oracle, set the values of db_driver to oracle.jdbc.OracleDriver. For DB2, set com.ibm.db2.jcc.DB2Driver. For mssql, set com.microsoft.sqlserver.jdbc.SQLServerDriver.
+      ## DB CONNECTION MANAGER DETAILS. COMMON FOR IBM PEM, PARTNER REPOSITORY &
+      #PARTNER PROVISIONER
+
+      #If you do not specify the size, a default value of 500 is set.
+      db_max_pool_size: 500 # Specify the maximum pool size of the master schema's database connection.
+      ## Specify the minimum pool size of the master schema's database connection.
+      #If you do not specify the size, a default value of 5 is set.
+      db_min_pool_size: 5
+
+      #If you do not specify the time, a default value of 1440m is set. Here, m refers tominutes.
+      db_aged_timeout: 1440m # Specify the maximum time after which the physical connection is discarded by pool maintenance of the master schema's database connection.
+
+      #. If you do not specify the idle time, a default value of 1440m is
+      #set. Here m refers to minutes.
+      db_max_idle_time: 1440m # Specify the maximum idle time for the master schema's database connection
+      ## Specify the keystore/truststore file name containing the public
+      #certificate and password of the master schema's database. The
+      #keystore/truststore (.jks file) has to be copied in the <mount
+      #location>/resources/security folder.
+      # db_sslTrustStoreName: #specify the truststore name
+
+      # db_sslTrustStoresecret: #Provide the secret name
+
+      # db_sslTrustStorePassword: #Provide the password secret name
+      ## Specify the database details for the test mode schema. These properties
+      #enable you to start the following docker containers: IBM PEM, Partner
+      #Provisioner, Migrator, Master key regenerator, and DBUtils.
+
+      # db_mssql_hostNameInCertificate: #Specify the host name to be used in validating the SQL Server TLS/SSL certificate, if hostname used in place of db_host ip then we do not have to provide the value for *_db_mssql_hostNameInCertificate (or not a mandatory field if we provide the hostname in the db_host property)
+      # db_mssql_sslProtocol: #Specify the TLS protocol to be considered during secure connection. Possible values are: TLS, TLSv1, TLSv1.1, and TLSv1.2. The default value will be TLSv1.2 if no value specified.
+
+      testmode_db_port: 50000 ## Specify the database details for the test mode schema. These properties enable you to start the following docker containers: IBM PEM, Partner Provisioner, Migrator, Master key regenerator, and DBUtils. Specify the port
+      testmode_db_host: pemtest.${PEM_NS}.svc # Specify the database host
+      testmode_db_name: pemdb #Specify the Database Name
+      testmode_db_schema: DB2INST2 #Specify the Database Schema
+      testmode_db_user: DB2INST1 # Specify the databse user name
+      #Provide the secret name
+      testmode_db_password: ${PEM_SECRET} #Provide the secret name
+      testmode_db_driver: com.ibm.db2.jcc.DB2Driver #Specify the database driver Name
+      ## TESTMODE DB CONNECTION MANAGER DETAILS. COMMON FOR IBM PEM, PARTNER
+      #REPOSITORY & PARTNER PROVISIONER
+      ## Specify the maximum pool size of the test mode schema's database
+      #connection. If you do not specify the size, a default value of 500 is set.
+      # testmode_db_max_pool_size: 500 # Specify the maximum number of database pool connections.
+      # ## Specify the minimum pool size of the test mode schema's database
+      # #connection. If you do not specify the size, a default value of 5 is set.
+      # testmode_db_min_pool_size: 5 #Specify the minimum number of database pool connections.
+      # ## Specify the maximum time after which the physical connection is discarded
+      # #by pool maintenance of the testmode schema's database connection. If you do
+      # #not specify the time, a default value of 1440m is set. Here, m refers to
+      # #minutes.
+      # testmode_db_aged_timeout: 1440m #Specify the interval in minutes before a physical connection is discarded.
+      # ## Specify the maximum idle time for the test mode schema's database
+      # #connection. If you do not specify the idle time, a default value of 1440m is
+      # #set. Here m refers to minutes.
+      # testmode_db_max_idle_time: 1440m #Specify the interval in minutes after which an unused or idle connection is discarded.
+      # ## Specify the keystore/truststore file name containing the public
+      # #certificate and password of the testmode schema's database.
+      # testmode_db_sslTrustStoreName: #Specify the SSL Keystore  file name for the test mode database schema.
+      # testmode_db_sslTrustStoresecret: #Specify the SSL Keystore secret for the test mode database schema.
+
+      # testmode_db_sslTrustStorePassword: #Provide the secret name
+
+      # testmode_db_mssql_hostNameInCertificate: #Specify the host name to be used in validating the SQL Server TLS/SSL certificate, if hostname used in place of db_host ip then we do not have to provide the value for *_db_mssql_hostNameInCertificate (or not a mandatory field if we provide the hostname in the db_host property)
+      # testmode_db_mssql_sslProtocol: #Specify the TLS protocol to be considered during secure connection. Possible values are: TLS, TLSv1, TLSv1.1, and TLSv1.2. The default value will be TLSv1.2 if no value specified.
+
+  security:
+    runAsUser: 1011 #specify the custom user to run the container
+    supplementalGroups:
+      - 555
+    fsGroup: 1011 #specify the custom group to run the container
+
+  setupfile:
+    servers:
+      ssl_protocol: #Specify the protocol for ECC certificate support.
+      enabled_ciphers: #Specify the ciphers for ECC certificate support.
+      enableConsoleLogs: true #Specify true or false for enabling or disabling logging in console 
+
+  ssoSeas:
+    enable: false #set the property to true to enable ssl connection
+    truststoreName: #Specify the secret name for truststorefile
+    truststoreSecret: #Provide the secret name
+    truststorePassword: #specify the secret name for truststore password
+    truststoreAlias: #Specify the SEAS truststore alias
+    truststoreType: #Specify the SEAS truststore type.
+    keystoreName: #Specify the secret name for keystore file
+    keystoreSecret: #Provide the secret name
+    keystorePassword: #specify the secret name for keystore password
+    keystoretype: #Specify the SEAS keystore type.
+    keystoreAlias: #Specify the SEAS keystore alias
+
+  ssomigration:
+    enable: false #if enabled resources volume must be enabled to generate data files
+    migrationAction: #specify the action to be performed by the migrator EXPORT MIGRATE REPORT
+    sponsorContext: #specify the sponsor which wanted to be migrated
+    orgDataFilename: #specify the name of file to be genarated for sponsor for export or as a input file for migration
+    userDataFilename: #specify the name of file to be genarated for users for export or as a input file for migration
+
+  pem:
+    enable: true #set to true to install IBM PEM
+    replicas: 1 #choose number of pods to be deployed
+    resources:
+      requests:
+        memory: "4Gi" #specify the memory request as needed
+        cpu: "1000m" #specify the cpu cores request as needed
+        ephemeral-storage: "2Gi" #Specify the ephemeral-storage request as needed
+      limits:
+        memory: "8Gi" #specify the maximimum memory a pod can utilize
+        cpu: "2000m" #specify the maximimum cpu a pod can utilize
+        ephemeral-storage: "4Gi" #Specify the maximimum ephemeral-storage a pod can utilize
+    autoscaling:
+      enabled: false #set to true if autoscaling of pods to be allowed
+      minReplicas: 1 #set the mimimun number of pods
+      maxReplicas: 2 #set the maximum number of pods to be scaled up
+      targetCPUUtilizationPercentage: 85 #set the limit of cpu utilization for autoscaling
+    readinessProbe:
+      initialDelaySeconds: 10 #set the initial delay to start readiness testing of pod in seconds
+      periodSeconds: 60 #set the time interval to perdorm readiness checks
+    livenessProbe:
+      initialDelaySeconds: 60 #set the initial delay to start liveness testing of pod in seconds
+      timeoutSeconds: 30
+      periodSeconds: 60 #set the time interval to perdorm liveness checks
+      successThreshold: 1
+      failureThreshold: 3
+    hostname: #specify the route dns host to access IBM PEM if not set default hostname will be generated
+    route:
+      tls:
+        termination: passthrough #Specify TLS termination types for serving certificates for securing the route. PEM currently supports reencrypt termination only.
+        insecureEdgeTerminationPolicy: None #Specify policy for traffic on insecure schemes like HTTP.
+    setupfile:
+      servers:
+        #For example, jvm_options: "-Xms4g -Xmx4g".
+        jvm_options: # Specify the list of JVM options for the servers, and separated by space.
+
+        keystore_password: ${PEM_SECRET} #Specify the secret name
+        keystore_alias: pem #Specify the secret alias
+        keystore_filename: ibm-pem.jks #Specify the secret name and key inside secret has to be same as secret name
+
+        # The default value is 100 MB.
+        max_file_size: 100 # Specify the maximum size for the server log file in MB.
+
+        max_files: 20 # Specify the maximum number of server log files. The default value is 20.
+
+        console_log_level: INFO ## Specify the console log level. For example, "INFO".
+
+        trace_specification: "*: info" ## Specify the trace specification. The default value is "*: info".
+
+  pp:
+    enable: true #set to true to install Partner Provisioner
+    replicas: 1 #choose number of pods to be deployed
+    resources:
+      requests:
+        memory: "2Gi" #specify the memory request as needed
+        cpu: "1000m"  #specify the cpu cores request as needed
+        ephemeral-storage: "2Gi" #Specify the ephemeral-storage request as needed
+      limits:
+        memory: "4Gi" #specify the maximimum memory a pod can utilize
+        cpu: "2000m" #specify the maximimum cpu a pod can utilize
+        ephemeral-storage: "4Gi" #Specify the maximimum ephemeral-storage a pod can utilize
+    autoscaling:
+      enabled: false #set to true if autoscaling of pods to be allowed
+      minReplicas: 1 #set the mimimun number of pods
+      maxReplicas: 2 #set the maximum number of pods to be scaled up
+      targetCPUUtilizationPercentage: 85 #set the limit of cpu utilization for autoscaling
+    readinessProbe:
+      initialDelaySeconds: 10 #set the initial delay to start readiness testing of pod in seconds
+      periodSeconds: 60 #set the time interval to perdorm readiness checks
+    livenessProbe:
+      initialDelaySeconds: 60 #set the initial delay to start liveness testing of pod in seconds
+      timeoutSeconds: 30
+      periodSeconds: 60 #set the time interval to perdorm liveness checks
+      successThreshold: 1
+      failureThreshold: 3
+    hostname: #specify the route dns host to access Partner Provisioner if not set default hostname will be generated
+    route:
+      tls:
+        termination: passthrough #Specify TLS termination types for serving certificates for securing the route. PEM currently supports reencrypt termination only.
+        insecureEdgeTerminationPolicy: None #Specify policy for traffic on insecure schemes like HTTP.
+    setupfile:
+      servers:
+
+        #For example, jvm_options: "-Xms4g -Xmx4g".
+        jvm_options: ## Specify the list of JVM options for the servers, and separated by space.
+        ## Specify the server details that are common for IBM PEM, Partner
+        #Repository, and Partner Provisioner. The keystore file (.jks file) has to be
+        #copied in the <mount location>/resources/security folder.
+        #Provide the secret name
+        keystore_password: ${PEM_SECRET} #Specify the secret name
+        keystore_alias: pem #Specify the secret alias
+        keystore_filename: ibm-pem.jks #Specify the secret name and key inside secret has to be same as secret name
+        # The default value is 100 MB.
+        max_file_size: 100 # Specify the maximum size for the server log file in MB.
+
+        max_files: 20 # Specify the maximum number of server log files. The default value is 20.
+
+        console_log_level: INFO ## Specify the console log level. For example, "INFO".
+
+        trace_specification: "*: info" ## Specify the trace specification. The default value is "*: info".
+        ## JMS PROPERTIES FOR PARTNER PROVISIONER & PARTNER REPOSITORY
+        ## Enables the Java Messaging Service (JMS) feature that is common for
+        #Partner Repository and Partner Provisioner.
+        ## TO ENABLE JMS FOR PARTNER REPOSITORY
+        ## For embedded client use enableJmsFeatures: "embdClientOnly"
+        ## For wmq client use enableJmsFeatures: "wmqClientOnly"
+        ## TO ENABLE JMS FOR PARTNER PROVISIONER
+        ## For embedded client use enableJmsFeatures: "embdClientOnly"
+        ## For embedded server use enableJmsFeatures: "embdServerAndClientOnly"
+        ## For wmq client use enableJmsFeatures: "wmqClientOnly"
+        ## For more information, refer to Configuring the properties of Setup.cfg
+        #file topic in the product documentation.
+        enable_jms_features: embdServerAndClientOnly
+        ## Specify the embedded JMS queue details that are common for Partner
+        #Repository and Partner Provisioner.
+        provisioner_request_queue: PEM_request #Specify the request queue name, which is used for communication between PEM Partner Provisioner and PEM Partner Repository using embedded JMS. Ensure that the queue name is same for both the service components.
+        provisioner_response_queue: PEM_response #Specify the response queue name, which is used for communication between PEM Partner Provisioner and PEM Partner Repository using embedded JMS. Ensure that the queue name is same for both the service components.
+        remote_server_ssl: false #Specify true for SSL (BootstrapSecureMessaging) and false for non-SSL (BootstrapBasicMessaging).
+        remote_server_host: ibm-pem-pp-jms-service.${PEM_NS}.svc #service hostname of jms service releasename-pp-jms-service.namespace.domain.com
+        remote_server_port: 80
+
+  pr:
+    enable: true #set to true to install Partner Repository
+    replicas: 1 #choose number of pods to be deployed
+    resources:
+      requests:
+        memory: "2Gi" #specify the memory request as needed
+        cpu: "1000m"  #specify the cpu cores request as needed
+        ephemeral-storage: "2Gi" #Specify the ephemeral-storage request as needed
+      limits:
+        memory: "4Gi" #specify the maximimum memory a pod can utilize
+        cpu: "2000m" #specify the maximimum cpu a pod can utilize
+        ephemeral-storage: "4Gi" #Specify the maximimum ephemeral-storage a pod can utilize
+    autoscaling:
+      enabled: false #set to true if autoscaling of pods to be allowed
+      minReplicas: 1 #set the mimimun number of pods
+      maxReplicas: 2 #set the maximum number of pods to be scaled up
+      targetCPUUtilizationPercentage: 85 #set the limit of cpu utilization for autoscaling
+    readinessProbe:
+      initialDelaySeconds: 10 #set the initial delay to start readiness testing of pod in seconds
+      periodSeconds: 60 #set the time interval to perdorm readiness checks
+    livenessProbe:
+      initialDelaySeconds: 60 #set the initial delay to start liveness testing of pod in seconds
+      timeoutSeconds: 30
+      periodSeconds: 60 #set the time interval to perdorm liveness checks
+      successThreshold: 1
+      failureThreshold: 3
+    hostname: #specify the route dns host to access Partner Provisioner if not set default hostname will be generated
+    route:
+      tls:
+        termination: passthrough #Specify TLS termination types for serving certificates for securing the route. PEM currently supports reencrypt termination only.
+        insecureEdgeTerminationPolicy: None #Specify policy for traffic on insecure schemes like HTTP.
+    setupfile:
+      servers:
+        ## Specify the list of JVM options for the servers, and separated by space.
+        #For example, jvm_options: "-Xms4g -Xmx4g".
+        jvm_options: ## Specify the list of JVM options for the servers, and separated by space.
+
+        keystore_password: ${PEM_SECRET} #Specify the secret name
+        keystore_alias: pem #Specify the secret alias
+        keystore_filename: ibm-pem.jks #Specify the secret name and key inside secret has to be same as secret name
+        # The default value is 100 MB.
+        max_file_size: 100 # Specify the maximum size for the server log file in MB.
+
+        max_files: 20 # Specify the maximum number of server log files. The default value is 20.
+
+        console_log_level: INFO ## Specify the console log level. For example, "INFO".
+
+        trace_specification: "*: info" ## Specify the trace specification. The default value is "*: info".
+        ## JMS PROPERTIES FOR PARTNER PROVISIONER & PARTNER REPOSITORY
+        ## Enables the Java Messaging Service (JMS) feature that is common for
+        #Partner Repository and Partner Provisioner.
+        ## TO ENABLE JMS FOR PARTNER REPOSITORY
+        ## For embedded client use enableJmsFeatures: "embdClientOnly"
+        ## For wmq client use enableJmsFeatures: "wmqClientOnly"
+        ## TO ENABLE JMS FOR PARTNER PROVISIONER
+        ## For embedded client use enableJmsFeatures: "embdClientOnly"
+        ## For embedded server use enableJmsFeatures: "embdServerAndClientOnly"
+        ## For wmq client use enableJmsFeatures: "wmqClientOnly"
+        ## For more information, refer to Configuring the properties of Setup.cfg
+        #file topic in the product documentation.
+        enable_jms_features: embdClientOnly
+        ## Specify the embedded JMS queue details that are common for Partner
+        #Repository and Partner Provisioner.
+        provisioner_request_queue: PEM_request #Specify the request queue name, which is used for communication between PEM Partner Provisioner and PEM Partner Repository using embedded JMS. Ensure that the queue name is same for both the service components.
+        provisioner_response_queue: PEM_response #Specify the response queue name, which is used for communication between PEM Partner Provisioner and PEM Partner Repository using embedded JMS. Ensure that the queue name is same for both the service components.
+        remote_server_ssl: false #Specify true for SSL (BootstrapSecureMessaging) and false for non-SSL (BootstrapBasicMessaging).
+        remote_server_host: ibm-pem-pp-jms-service.${PEM_NS}.svc #service hostname of jms service releasename-pp-jms-service.namespace.domain.com
+        remote_server_port: 80
+
+  ## If you are using WebSphere MQ (WMQ) as your JMS service provider, specify
+  #the WMQ details that are common for Partner Repository and Partner
+  #Provisioner.
+  wmq:
+    channel: #Specify the WebSphere MQ channel name
+    connection_name_list: #Specify the WebSphere MQ connection list separated by comma. For example, 9.89.31.226 (19443), 9.77.53.126 (17286). This example is valid for a WebSphere MQ setup with HA (High Availability).For WMQ without HA, it can be a single <host_name or IP>:<port_number>.
+    queue_manager: #Specify the WebSphere MQ queue manager.
+    username: #Specify the WebSphere MQ user name.
+    password: #Provide the secret name
+    wmq_provisioner_request_queue_manager: #Specify the WebSphere MQ request queue manager.
+    wmq_provisioner_response_queue_manager: #Specify the WebSphere MQ response queue manager.
+    wmq_provisioner_request_queue_name: #Specify the WebSphere MQ request queue name.
+    wmq_provisioner_response_queue_name: #Specify the WebSphere MQ response queue name.
+    ssl_cipher_suite: #Specify a valid SSL cipher suite.If SSL is enabled on the WebSphere MQ connection channel, provide the SSL cipher suite corresponding to the SSL cipher specifications configured on the WebSphere MQ connection channel.
+
+  purge:
+    enable: false
+    schedule: "0 9 * * 1"
+    resources:
+      requests:
+        memory: "0.5Gi" #specify the memory request as needed
+        cpu: "100m"  #specify the cpu cores request as needed
+        ephemeral-storage: "2Gi" #Specify the ephemeral-storage request as needed
+      limits:
+        memory: "1Gi" #specify the maximimum memory a pod can utilize
+        cpu: "500m" #specify the maximimum cpu a pod can utilize
+        ephemeral-storage: "3Gi" #Specify the maximimum ephemeral-storage a pod can utilize
+    setupfile:
+      purge:
+        name: #	Specify the purge tool name.This property prevents two users who specify the same purge name from purging the records simultaneously. This property is mandatory. So, ensure that the value is not blank.
+
+        number_of_purge_days: 180 #Specify the number of retention days before the current date for which the records need to be purged. Only those records that qualify are purged. For example, if you specify 60 days, records that are present before 60 days from the current date and satisfy the purge criteria are purged.
+
+        purge_count: 1 #Specify the number of records to be purged in a batch. IMPORTANT: Please do not modify this value.
+
+        sponsor_context: ## Specify the Sponsor context or * where * takes all the sponsors in the system
+
+        no_of_db_connections: 50 ## Specify the maximum number of pooled connections allowed for the
+
+        resource_to_purge: SPONSOR ## Default value for resource_to_purge is set to . For more information, refer to Configuring the properties of Setup.cfg
+
+        #
+        resource_to_purge_key: ## Specify the resource key for Sponsor / Sponsor user / Partner / Partner user / Third party processor / Third party processor user.
+
+        purge_strategy: ARCHIVE # To enable purge, purge_strategy: "DELETE". This will only delete data from source database. To enable archive, purge_strategy: "ARCHIVE". This will delete data from source database and copies to target database.
+        purge_strategy_data_scope: DELETED_DATA #Scope for purge strategy <ALL_DATA/DELETED_DATA>. Specify the strategy to delete or archive only the deleted data or all data of the resource.
+
+        ## Enable or disable the source database and target database schemas are
+        #same or not. Valid values are true and false and the default value is set to
+        #true.
+        target_db_is_same_as_source_db: false
+        target_no_of_db_connections: 50 #Specify the maximum number of pooled connections that are allowed to the target database from the Purge tool.
+        
+        ## DATABASE AND SSL PROPERTIES FOR PURGE TARGET DATABASE, This properties
+        #need to configure only
+        target_db_port: #Specify the database port
+        target_db_host: #Specify the database host
+        target_db_name: #Specify the database name
+        target_db_schema: #Specify the database schema
+        target_db_user: #Specify the database user
+        target_db_password: #Specify database secret
+        target_db_driver: #Specify the database driver
+
+        target_ssl_connection: false #Enable or disable the SSL connection for purge target database schema. Valid values are true and false and the default value is set to false.
+        target_db_sslTrustStoreName:
+        target_db_sslTrustStoreSecret:
+        target_db_sslTrustStorePassword: #Provide the keystore name
+        target_db_mssql_hostNameInCertificate: #Specify the host name to be used in validating the SQL Server TLS/SSL certificate, if hostname used in place of db_host ip then we do not have to provide the value for *_db_mssql_hostNameInCertificate (or not a mandatory field if we provide the hostname in the db_host property)
+        target_db_mssql_sslProtocol: #Specify the TLS protocol to be considered during secure connection. Possible values are: TLS, TLSv1, TLSv1.1, and TLSv1.2. The default value will be TLSv1.2 if no value specified.
+
+        target_db_type: ## Specify the type of purge target database, either DB2 or oracle os mssql.
+
+        jvm_options: ## Specify the list of JVM options for purge separated by space.
+
+        java_util_logging_file_handler_level: INFO ## Specify the log level, either FINE, INFO, or SEVERE.
+
+        java_util_logging_file_handler_limit: ## Specify the file size limit, in MB for each log file.
+
+        java_util_logging_file_handler_count: ## Specify the number of log files.
+
+  agent:
+    replicas: 1
+    enable: false
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "1000m"
+        ephemeral-storage: "2Gi" #Specify the ephemeral-storage request as needed
+      limits:
+        memory: "4Gi"
+        cpu: "2000m"
+        ephemeral-storage: "3Gi" #Specify the maximimum ephemeral-storage a pod can utilize
+    setupfile:
+      agent:
+        ## AGENT
+
+        #s
+        #
+        type: ## Specify the type of agent, scanagent or certificateupdate. If you want to run both Scan Agent and certificate update, specify both the value separated by commas. For example, "scanagent,certificateupdate".
+
+        jvm_options: ## Specify the list of JVM options for the scan agent separated by space.
+
+        antivirus_server_host:  ## Set the host or IP of the antivirus server.
+
+        antivirus_server_port: ## Enter a port number of the antivirus server.
+
+        #The default value is 50.
+        no_of_db_connections: 50 ## Specify the maximum number of pooled connections allowed to the database.
+
+        retry_interval_in_sec: 21600 ## Specify the time interval between retries for connection failure with antivirus server. and accepts only numeric values.
+
+        max_retry_count: 1460 ## Specify the maximum number of times the agent must retry scanning a file, in case the scan fails for some reason. and accepts only numeric values.
+
+        com_ibm_vch_identity_security_limit: 100 ## Specify the limit, in MB for each log file.
+
+        com_ibm_vch_identity_security_level: INFO ## Specify the log level, either FINE, INFO, or SEVERE.
+
+        com_ibm_vch_identity_security_count: 20 ## Specify the number of log file counts.
+
+        scan_extensibility_class: ## Specify the class to enable antivirus extensibility.
+
+  gateway:
+    enable: true #set to true to install Partner Repository
+    replicas: 1 #choose number of pods to be deployed
+    resources:
+      requests:
+        memory: "2Gi" #specify the memory request as needed
+        cpu: "1000m"  #specify the cpu cores request as needed
+        ephemeral-storage: "2Gi" #Specify the ephemeral-storage request as needed
+      limits:
+        memory: "4Gi" #specify the maximimum memory a pod can utilize
+        cpu: "2000m" #specify the maximimum cpu a pod can utilize
+        ephemeral-storage: "4Gi" #Specify the maximimum ephemeral-storage a pod can utilize
+    readinessProbe:
+      initialDelaySeconds: 10 #set the initial delay to start readiness testing of pod in seconds
+      periodSeconds: 60 #set the time interval to perdorm readiness checks
+    livenessProbe:
+      initialDelaySeconds: 60 #set the initial delay to start liveness testing of pod in seconds
+      timeoutSeconds: 30
+      periodSeconds: 60 #set the time interval to perdorm liveness checks
+      successThreshold: 1
+      failureThreshold: 3
+    hostname: #specify the route dns host to access gateway IMPORTANT in order to enable api this property must be set
+    route:
+      tls:
+        termination: passthrough #Specify TLS termination types for serving certificates for securing the route. PEM currently supports reencrypt termination only.
+        insecureEdgeTerminationPolicy: None #Specify policy for traffic on insecure schemes like HTTP.
+    setupfile:
+      servers:
+
+        jvm_options: ## Specify the list of JVM options for the servers, and separated by space. For example, jvm_options: "-Xms4g -Xmx4g".
+
+        keystore_password: ${PEM_SECRET} #Specify the secret name
+        keystore_alias: pem #Specify the secret alias
+        keystore_filename: ibm-pem.jks #Specify the secret name and key inside secret has to be same as secret name
+
+        max_file_size: 100 # Specify the maximum size for the server log file in MB.
+
+        max_files: 20 # Specify the maximum number of server log files. The default value is 20.
+
+        console_log_level: INFO ## Specify the console log level. For example, "INFO".
+
+        trace_specification: "*: info" ## Specify the trace specification. The default value is "*: info".
+      gateway:
+        ## GATEWAY
+        ## Enter the list of containers available for each service in a comma
+        #separated fashion [https://<host1>:<port1>,https://<host2>:<port2>,...]
+        pem_servers: #Specify the PEM service URL. PEM service is created with following name format: <release_name>-pem-service and port as 80. Example value: https://my-release-pem-service:80 where my-release is the release name. This field is important to specify a list of PEM containers to which API calls are sent by the Gateway. If more than one container address is specified, then the Gateway load balances.
+        pr_servers: #Specify the PR service URL. PR service is created with following name format: <release_name>-pr-service and port as 80. Example value: https://my-release-pr-service:80 where my-release is the release name. This field is important to specify a list of PR containers to which API calls are sent by the Gateway. If more than one container address is specified, then the Gateway load balances.
+        max_file_size: #This value sets the limit to the size of the file that is uploaded via Gateway.
+        max_request_size: #This value sets the limit to the size of request that is uploaded via Gateway.
+        hostname_validation_required: true #This flag is provided to enable/disable certificate hostname validation for API Gateway.
+
+  communitymanager:
+    install: true
+    image:
+      repository: "cp.icr.io/cp/ibm-pem/pem_cm" #Specify the repository
+      pullPolicy:  #Specify te image pull policy
+      tag: "${PEM_VERSION}" #Specify the tag name
+      pullSecret: ibm-entitlement-key #Provide the pull secret name
+    prod:
+      enable: true #If you are want to proceed for prod pcm installation then you have to mention it as true or else false
+      setupfile:
+        acceptLicence: true #We should make accept-license should be true for pcm installation
+        cm:
+          color: black  #This will enable the black theme in UI, PCM colores. red, green, grey, yellow, black
+          cmks: #Provide the password secret
+        server:
+          ssl:
+            enabled: true #Application will try to enable SSL if it is true
+            key_store: ibm-pem.jks #Application will try to load the key-store from this location if ssl enabled.
+            keystoresecret: ibm-pem.jks #secret for keystore
+            key_store_password: ${PEM_SECRET} #keystorepass_secret
+            key_store_type: JKS # PKCS12 #Here we need to provide keystore type
+          serverHeader: "IBM Partner Engagement Manager Community Manager" #Default server header i,.e IBM Partner Engagement Manager Community Manager
+          compression:
+            enabled: true #Defualt is set to true  , Please don't change
+            min_response_size: 1024 #Default size is 1024 , Constant value please dont change
+          ajp:
+            enabled: false
+            port: 8585
+        spring:
+          liquibase:
+            enabled: true # If you want to run Database script along with code deployment then make it as true or else false
+            liquibase_tablespace:
+          datasource:
+            type: com.zaxxer.hikari.HikariDataSource # This should be constant, please dont change
+            url: jdbc:db2://db2-lb.${B2BI_PROD}.svc:50000/B2BIDB #Datbase url example jdbc:\:thin:@DBHostname:1521/DBName
+            username: DB2INST1 #Specify the database username
+            dbpassword: ibm-pem-cm-secret-prod #Provide the sceret name
+            driver_class_name: com.ibm.db2.jcc.DB2Driver #Provide db driver class name Ex: 
+            hikari:
+              connection_timeout: 60000 #Connection timeout
+              maximum_pool_size: 40 # this actually depends on no of users access the application
+              auto_commit: false
+            ssl:
+              enabled: false
+              trust_store: #truststore name
+              trustStoreSecret: #secret for keystore
+              trust_store_type: PKCS12
+              trust_store_cmks: #truststore password secret
+          jpa:
+            show_sql: true #Default value is true
+            open_in_view: false ##Default value is true
+            database_platform: com.pe.pcm.config.database.dialect.DB2ExtendedDialect #Default value
+            properties:
+              id:
+                new_generator_mappings: true #Default value is true
+            hibernate:
+              naming:
+                physical_strategy: com.pe.pcm.config.database.PhysicalNamingStrategy
+          mail:
+            host: smtp.hostname.com
+            port: 587 #25
+            username: UserName@company.com #Specify the username exmaple: username@compnay.com
+            cmks: ${PEM_SECRET} #Provde the password secret
+            from: from_mailid@company.com
+            app_contact_mail: app_contact_mailid@company.com
+            mail_signature: "Community Manager Portal support team."
+            properties:
+              mail:
+                smtp:
+                  auth: true #If you want to send a mail with ssl authentication then make it as true or elase false
+                  starttls:
+                    enable: true #If you want to send a mail with ssl authentication then make it as true or else false
+                  ssl:
+                    trust: "*"
+          thymeleaf:
+            cache: true #this is constant, please dont change
+        login:
+          sm:
+            enable: false #If the customer has Siteminder login then make it as true or else false
+            param_name: SM_USER #Provide the username
+          max_false_attempts: 5 #Maximum attempts
+          reset_false_attempts: 3 #Minutes
+          user_cmks_expire: 30 #days
+        basic:
+          auth:
+            username: pemuser #Specifythe user name
+            cmks: #specify the secret
+        jwt:
+          secretkey: CACE9E5A149ED201C4033C1A1E02C9BE
+          session_expire: 60 # Minutes (Token session Expiry)
+        sterling_b2bi:
+          core_bp:
+            inbound: CM_MailBox_GET_RoutingRule_Inbound #CM_MailBox_GET_RoutingRule_Inbound , Inbound mailbox bootstrap business process
+            outbound: CM_MailBox_GET_RoutingRule_Outbound #CM_MailBox_GET_RoutingRule_Outbound , Outbound mailbox bootstrap business process
+          user:
+            cmks: #This passphrase will be used while creating profile in SI create a scret and with SI password. provide the secret
+            cmks_validation: false #If you want to validate aboove passphrase when applicaton get starts then make this value as true or else false
+            cmks_validation_profile: CM_Profile #TestProfile, We have to provide the SFTP profile which is available in SI with password as Expl@re
+          b2bi_api:
+            active: true #This will say whether B2Bi API available or not
+            auth_host: #This tag will accept key Value pair here we need to configure the External user User Hostname as key and order as value
+              host1: #multiple hosts can be added
+                name: "[SEAS Authentication]" #Sterling integrator authentication host name
+                value: 1
+              #host2:
+              #  name:
+              #  value:
+            api:
+              username: cm_user # user name to authenticate the API
+              cmks: #Password secret
+              baseUrl:
+            b2bi_sfg_api: #IBM B2B API with SFG
+              active: true #If we say true then SFG Apis available along with B2Bi APIs
+              community_name: CM_PEMCommunity #SFG Community Name, which will be used while creating profile in SFG through APIs
+            sfg_api: #IBM V6 SFG API config
+              active: true
+              api:
+                username: cm_user
+                cmks: ${PEM_SECRET} #ENC(KKtUwo6lrp1At7pa/fUn4g==)
+                baseUrl:
+            as2: #true : If AS2 API Available in B2Bi APIs and if you want to use it from CM
+              active: false
+            cd:
+              net_map_name: prodCD
+              proxy:
+                internal: # This info will be used to create Node in Internal Proxy when CM creates B2Bi_CONNECT_DIRECT
+                  server_host: #Specify the server host
+                  server_port: 1364
+                  secure_plus_option: ENABLED
+                  ca_cert: CA_cd_0099
+                  system_certificate: B2BHttp
+                  security_protocol: TLS 1.2
+                  cipher_suites: ECDHE_RSA_WITH_3DES_EDE_CBC_SHA
+                external: # This info will be used to create Node in External Proxy when CM creates B2Bi_CONNECT_DIRECT
+                  server_host:
+                  server_port: 1364
+                  secure_plus_option: ENABLED
+                  ca_cert: CA_cd_0099
+                  system_certificate: B2BHttp
+                  security_protocol: TLS 1.2
+                  cipher_suites: ECDHE_RSA_WITH_3DES_EDE_CBC_SHA
+        ssp: #IBM SSP API Configuration
+          active: false #if we have SSP APIs enable then make it as true or else false
+          api:
+            username: ssp_user #User name to authenticate the API
+            cmks: ${PEM_SECRET} #Password or Secret of the above user
+            baseUrl: #Provide  Base URL of the SSP API
+        adapters: #Profiles Default Adapters Details Configuration
+          ftpServerAdapterName: CM_FTPServerAdapter #Specify the respective adapter name
+          ftpsClientAdapterName: FTP Client Adapter #Specify the respective adapter name
+          ftpClientAdapterName: CDServrAdapter #Specify the respective adapter name
+          ftpsServerAdapterName: CM_FTPS_ServerAdapter #Specify the respective adapter name
+          sftpServerAdapterName: CM_SFTPServerAdapter #Specify the respective adapter name
+          sftpClientAdapterName: CM_SFTPClientAdapter #Specify the respective adapter name
+          as2ServerAdapterName: CM_AS2ServerAdapter #Specify the respective adapter name
+          as2ClientAdapterName: CM_AS2ClientAdapter #Specify the respective adapter name
+          as2HttpClientAdapter: HTTPClientAdapter #Specify the respective adapter name
+          cdClientAdapterName: CM_CDClientAdapter #Specify the respective adapter name
+          httpServerAdapterName: CM_HTTPServerSync #Specify the respective adapter name
+          httpsServerAdapterName: CM_HTTPSServerSync #Specify the respective adapter name
+          mqAdapterName: CM_MQAdapter #Specify the respective adapter name
+          wsServerAdapterName: CM_HTTPSServerSync #Specify the respective adapter name
+          fsAdapter: CMFileSystem #Specify the respective adapter name
+          sfgSftpClientAdapterName: CM_SFTPClientAdapter #Specify the respective adapter name
+          sfgSftpServerAdapterName: CM_SFTPServerAdapter #Specify the respective adapter name
+          sfgFtpClientAdapterName: CM_FTPClientAdapter #Specify the respective adapter name
+          sfgFtpServerAdapterName: CM_FTPServerAdapter #Specify the respective adapter name
+          sfgFtpsClientAdapterName: CM_FTPSClientAdapter #Specify the respective adapter name
+          sfgFtpsServerAdapterName: CM_FTPS_ServerAdapter #Specify the respective adapter name
+        alerts:
+          email:
+            enable:
+              create: false #enable to receive creation alerts
+              update: false #enable to receive update alerts
+              delete: false #enable to receive delete alerts
+              reports: false #enable to receive report alerts
+        workFlow:
+          duplicate:
+            mft: true #If you want to allow Duplicate MFT Transactions with in the flow then update true or else make it false.
+            docHandling: true #If you want to allow Duplicate DH Transactions with in the application then update true or else make it false.
+        file_transfer:
+          search:
+            time_range: 30 #Minutes
+        saml:
+          jwt:
+            secret_key: yeWAgVDfb$!MFn@MCJVN7uqkznHbDLR# #jwt token
+            session_expire: 60 # Minutes
+          idp:
+            metadata: #Provide the IDP metadata file location.
+            entity_id: PcmEntityIdp #.Provide the Entity name whic we provide in IDP
+          scheme: https # Provide the PCM deployed protocol name.
+          host: #Provide the saml Application deployed host.
+          url:
+            client: #Provide the Application Access URL
+            entity: #Provide the Application Access URL
+          ssl:
+            key_store: #Absolute path of the JKS file
+            key_cmks: #specify the secret
+            store_cmks: #specify the secret
+            key_alias: #specify the alias name
+        pem:
+          remote:
+            server:
+              enabled: false #enable to use pem key
+              pem_key: #Provide the pemKey
+              pemKeySecret: #secret for pemkey
+              base_directory:
+                path: #Provide the base directory path
+              session_timeout: 5000 #Time in milliseconds
+          datasource:
+            url: jdbc:db2://pemdb.${PEM_NS}.svc:50000/PEMDB #Datbase url example jdbc::thin:@DBHostname:1521/DBName
+            username: DB2INST1 #Specify the database username
+            cmks: ${PEM_SECRET} #Provide the sceret name
+            driver_class_name: com.ibm.db2.jcc.DB2Driver #Provide db driver class name Ex: .jdbc.driver.
+          api_ws:
+            active: true
+            base_url: #specify the url
+            username: PEMUsername
+            cmks: ${PEM_SECRET} #specify the secret name
+        file:
+          archive:
+            scheduler:
+              cron: "0 0 0 ? * * *" #"0 0 0 ? * * *" #At 00:00:00am every day, "* * * * * ? *" Every second
+              delete_files_job:
+                active: false
+                script_file_loc: /usr/CMArchiveDelete.sh #Absolute path of Delete script file
+            pgp:
+              enabled: false #enable to use pgp key
+              private_key: #provide the pgp key name
+              privateKeySecret: #specify the pgp secret
+              cmks: #PGP key passphrase secret
+            aes:
+              secret_key: 3p+KB8sEYgX7R6Jh0MJRSQ==
+              salt: 9XboGbY6CkAqYi6WB2tTiQ==
+        ssomigration:
+          enable: false #enbale to start the migration
+          data:
+            action: EXPORT  #Actions:  EXPORT, MIGRATE, REPORT
+            file_name: pcm_user #File name which will be used in EXPORT, MIGRATE, and REORT Actions
+        loggerLevel: INFO #set the value to generate logs accepted values INFo , ERROR, DEBUG
+
+        sso_ssp_seas:
+          enable: false
+          ssp:
+            logout_endpoint: /Signon/logout.html #SSP Logout endpoint ,default value is : /Signon/logout.html
+            user_header_name: SM_USER #User header name config in SSP, default value is : SM_USER
+            token_cookie_name: SSOTOKEN #Token cookie name config in SSP, default value is : SSOTOKENS
+          seas:
+            auth_profile: communityManager #Authentication Profile Name in SEAS
+            host: SEAS_Host #SEAS Host Name
+            port: SEAS_Port #SEAS Port
+            ssl:
+              enabled: false #SSL enable or not in SEAS
+              protocol: #SEAS Protocol (Optional)
+              cipher_suits:  #SEAS Cipher Suits (Optional)
+              trust_store:
+                name: keystore.p12 #SEAS truststore file name
+                secretName: #secret for truststore
+                cmks: #truststore_Password secret #SEAS truststore password
+                alias: seasssl_sso #SEAS truststore alias
+                type: PKCS12 #SEAS truststore type
+              key_store:
+                name: keystore.p12 #SEAS keystore file name
+                secretName: #secret for truststore
+                cmks: #keystore_Password secret #SEAS keystore password.
+                alias: community_manager #SEAS keystore alias
+                type: PKCS12 #SEAS keystore type
+          user_request:
+            user: #Custom properties config in SEAS
+              email: email #Email property name config in SEAS
+              role: role #Role property name config in SEAS
+              first_name: firstName #FirstName property name config in SEAS
+              last_name: lastName #LastName property name config in SEAS
+              phone: phone #Phone property name config in SEAS
+              external_id: externalId #FirstName property name config in SEAS
+              preferred_language: prefferedLanguage #Language property name config in SEAS(Optional)
+            user_roles: #LDAP roles mapping to PCM (CM Role - LDAP Role)
+              super_admin: superAdmin #specify the ldap role name for super_admin
+              admin: admin #specify the ldap role name for super_admin
+              on_boarder: creator #specify the ldap role name for admin
+              business_admin: bAdmin #specify the ldap role name for on_boarder
+              business_user: bUser #specify the ldap role name for business_user
+              data_processor: processor #specify the ldap role name for data_processor
+              data_processor_restricted: processorRes #specify the ldap role name for data_processor_restricted
+      replicacount: 1 #specify the number of pods to be deployed
+      autoscaling:
+        enabled: false #set to true if autoscaling of pods to be allowed
+        minReplicas: 1 #set the mimimun number of pods
+        maxReplicas: 2 #set the maximum number of pods to be scaled up
+        targetCPUUtilizationPercentage: 85 #set the limit of cpu utilization for autoscaling
+      resources:
+        requests:
+          memory: "2Gi" #specify the memory request as needed
+          cpu: "1000m"  #specify the cpu cores request as needed
+          ephemeral-storage: 2Gi
+        limits:
+          memory: "4Gi" #specify the maximimum memory a pod can utilize
+          cpu: "2000m" #specify the maximimum cpu a pod can utilize
+          ephemeral-storage: 3Gi
+      readinessProbe:
+        initialDelaySeconds: 10 #set the initial delay to start readiness testing of pod in seconds
+        periodSeconds: 60 #set the time interval to perdorm readiness checks
+      livenessProbe:
+        initialDelaySeconds: 60 #set the initial delay to start liveness testing of pod in seconds
+        timeoutSeconds: 30
+        periodSeconds: 60 #set the time interval to perdorm liveness checks
+        successThreshold: 1
+        failureThreshold: 3
+      hostname: #specify the route dns host to access Partner Provisioner if not set default hostname will be generated
+      archive:
+        enable: false #set to true to enable persistent volume for archive
+        capacity: 100Mi
+        storageclass: slow
+    nonprod:
+      enable: true #set to true to deploy non prod pcm
+      setupfile:
+        acceptLicence: true #We should make accept-license should be true for pcm installation
+        cm:
+          color: black  #This will enable the black theme in UI, PCM colores. red, green, grey, yellow, black
+          cmks: #Provide the password secret
+        server:
+          ssl:
+            enabled: true #Application will try to enable SSL if it is true
+            key_store: ibm-pem.jks #Application will try to load the key-store from this location if ssl enabled.
+            keystoresecret: ibm-pem.jks #secret for keystore
+            key_store_password: ${PEM_SECRET} #keystorepass_secret
+            key_store_type: JKS # PKCS12 #Here we need to provide keystore type
+          serverHeader: "IBM Partner Engagement Manager Community Manager" #Default server header i,.e IBM Partner Engagement Manager Community Manager
+          compression:
+            enabled: true #Defualt is set to true  , Please don't change
+            min_response_size: 1024 #Default size is 1024 , Constant value please dont change
+          ajp:
+            enabled: false
+            port: 8585
+        spring:
+          liquibase:
+            enabled: true # If you want to run Database script along with code deployment then make it as true or else false
+            liquibase_tablespace:
+          datasource:
+            type: com.zaxxer.hikari.HikariDataSource # This should be constant, please dont change
+            url: "jdbc:db2://db2-lb.${B2BI_NONPROD}.svc:50000/B2BIDB" # Specify the database url  example for jdbc::thin:@localhost:1521/XE
+            username: DB2INST1 #Specify the database user naem
+            dbpassword: ibm-pem-cm-secret-nonprod #secretName
+            driver_class_name: com.ibm.db2.jcc.DB2Driver #Specify the dirver class name
+            hikari:
+              connection_timeout: 60000 #Connection timeout
+              maximum_pool_size: 40 # this actually depends on no of users access the application
+              auto_commit: false
+            ssl:
+              enabled: false
+              trust_store: #truststore name
+              trustStoreSecret: #secret for keystore
+              trust_store_type: PKCS12
+              trust_store_cmks: #truststore password secret
+          jpa:
+            show_sql: true #Default value is true
+            open_in_view: false ##Default value is true
+            database_platform: com.pe.pcm.config.database.dialect.DB2ExtendedDialect #Default value
+            properties:
+              id:
+                new_generator_mappings: true #Default value is true
+            hibernate:
+              naming:
+                physical_strategy: com.pe.pcm.config.database.PhysicalNamingStrategy
+          mail:
+            host: smtp.hostname.com
+            port: 587 #25
+            username: UserName@company.com #Specify the username exmaple: username@compnay.com
+            cmks: ${PEM_SECRET} #Provde the password secret
+            from: from_mailid@company.com
+            app_contact_mail: app_contact_mailid@company.com
+            mail_signature: "Community Manager Portal support team."
+            properties:
+              mail:
+                smtp:
+                  auth: true #If you want to send a mail with ssl authentication then make it as true or elase false
+                  starttls:
+                    enable: true #If you want to send a mail with ssl authentication then make it as true or else false
+                  ssl:
+                    trust: "*"
+          thymeleaf:
+            cache: true #this is constant, please dont change
+        login:
+          sm:
+            enable: false #If the customer has Siteminder login then make it as true or else false
+            param_name: SM_USER #Provide the username
+          max_false_attempts: 5 #Maximum attempts
+          reset_false_attempts: 3 #Minutes
+          user_cmks_expire: 30 #days
+        basic:
+          auth:
+            username: pemuser #Specifythe user name
+            cmks: #specify the secret
+        jwt:
+          secretkey: CACE9E5A149ED201C4033C1A1E02C9BE
+          session_expire: 60 # Minutes (Token session Expiry)
+        sterling_b2bi:
+          core_bp:
+            inbound: CM_MailBox_GET_RoutingRule_Inbound #CM_MailBox_GET_RoutingRule_Inbound , Inbound mailbox bootstrap business process
+            outbound: CM_MailBox_GET_RoutingRule_Outbound #CM_MailBox_GET_RoutingRule_Outbound , Outbound mailbox bootstrap business process
+          user:
+            cmks: #This passphrase will be used while creating profile in SI create a scret and with SI password. provide the secret
+            cmks_validation: false #If you want to validate aboove passphrase when applicaton get starts then make this value as true or else false
+            cmks_validation_profile: CM_Profile #TestProfile, We have to provide the SFTP profile which is available in SI with password as Expl@re
+          b2bi_api:
+            active: true #This will say whether B2Bi API available or not
+            auth_host: #This tag will accept key Value pair here we need to configure the External user User Hostname as key and order as value
+              host1: #multiple hosts can be added
+                name: "[SEAS Authentication]" #Sterling integrator authentication host name
+                value: 1
+              #host2:
+              #  name:
+              #  value:
+            api:
+              username: cm_user # user name to authenticate the API
+              cmks: #Password secret
+              baseUrl:
+            b2bi_sfg_api: #IBM B2B API with SFG
+              active: true #If we say true then SFG Apis available along with B2Bi APIs
+              community_name: CM_PEMCommunity #SFG Community Name, which will be used while creating profile in SFG through APIs
+            sfg_api: #IBM V6 SFG API config
+              active: true
+              api:
+                username: cm_user
+                cmks: ${PEM_SECRET} #ENC(KKtUwo6lrp1At7pa/fUn4g==)
+                baseUrl:
+            as2: #true : If AS2 API Available in B2Bi APIs and if you want to use it from CM
+              active: false
+            cd:
+              net_map_name: prodCD
+              proxy:
+                internal: # This info will be used to create Node in Internal Proxy when CM creates B2Bi_CONNECT_DIRECT
+                  server_host: #Specify the server host
+                  server_port: 1364
+                  secure_plus_option: ENABLED
+                  ca_cert: CA_cd_0099
+                  system_certificate: B2BHttp
+                  security_protocol: TLS 1.2
+                  cipher_suites: ECDHE_RSA_WITH_3DES_EDE_CBC_SHA
+                external: # This info will be used to create Node in External Proxy when CM creates B2Bi_CONNECT_DIRECT
+                  server_host:
+                  server_port: 1364
+                  secure_plus_option: ENABLED
+                  ca_cert: CA_cd_0099
+                  system_certificate: B2BHttp
+                  security_protocol: TLS 1.2
+                  cipher_suites: ECDHE_RSA_WITH_3DES_EDE_CBC_SHA
+        ssp: #IBM SSP API Configuration
+          active: false #if we have SSP APIs enable then make it as true or else false
+          api:
+            username: ssp_user #User name to authenticate the API
+            cmks: ${PEM_SECRET} #Password or Secret of the above user
+            baseUrl: #Provide  Base URL of the SSP API
+        adapters: #Profiles Default Adapters Details Configuration
+          ftpServerAdapterName: CM_FTPServerAdapter #Specify the respective adapter name
+          ftpsClientAdapterName: FTP Client Adapter #Specify the respective adapter name
+          ftpClientAdapterName: CDServrAdapter #Specify the respective adapter name
+          ftpsServerAdapterName: CM_FTPS_ServerAdapter #Specify the respective adapter name
+          sftpServerAdapterName: CM_SFTPServerAdapter #Specify the respective adapter name
+          sftpClientAdapterName: CM_SFTPClientAdapter #Specify the respective adapter name
+          as2ServerAdapterName: CM_AS2ServerAdapter #Specify the respective adapter name
+          as2ClientAdapterName: CM_AS2ClientAdapter #Specify the respective adapter name
+          as2HttpClientAdapter: HTTPClientAdapter #Specify the respective adapter name
+          cdClientAdapterName: CM_CDClientAdapter #Specify the respective adapter name
+          httpServerAdapterName: CM_HTTPServerSync #Specify the respective adapter name
+          httpsServerAdapterName: CM_HTTPSServerSync #Specify the respective adapter name
+          mqAdapterName: CM_MQAdapter #Specify the respective adapter name
+          wsServerAdapterName: CM_HTTPSServerSync #Specify the respective adapter name
+          fsAdapter: CMFileSystem #Specify the respective adapter name
+          sfgSftpClientAdapterName: CM_SFTPClientAdapter #Specify the respective adapter name
+          sfgSftpServerAdapterName: CM_SFTPServerAdapter #Specify the respective adapter name
+          sfgFtpClientAdapterName: CM_FTPClientAdapter #Specify the respective adapter name
+          sfgFtpServerAdapterName: CM_FTPServerAdapter #Specify the respective adapter name
+          sfgFtpsClientAdapterName: CM_FTPSClientAdapter #Specify the respective adapter name
+          sfgFtpsServerAdapterName: CM_FTPS_ServerAdapter #Specify the respective adapter name
+        alerts:
+          email:
+            enable:
+              create: false #enable to receive creation alerts
+              update: false #enable to receive update alerts
+              delete: false #enable to receive delete alerts
+              reports: false #enable to receive report alerts
+        workFlow:
+          duplicate:
+            mft: true #If you want to allow Duplicate MFT Transactions with in the flow then update true or else make it false.
+            docHandling: true #If you want to allow Duplicate DH Transactions with in the application then update true or else make it false.
+        file_transfer:
+          search:
+            time_range: 30 #Minutes
+        saml:
+          jwt:
+            secret_key: yeWAgVDfb$!MFn@MCJVN7uqkznHbDLR# #jwt token
+            session_expire: 60 # Minutes
+          idp:
+            metadata: #Provide the IDP metadata file location.
+            entity_id: PcmEntityIdp #.Provide the Entity name whic we provide in IDP
+          scheme: https # Provide the PCM deployed protocol name.
+          host: #Provide the saml Application deployed host.
+          url:
+            client: #Provide the Application Access URL
+            entity: #Provide the Application Access URL
+          ssl:
+            key_store: #Absolute path of the JKS file
+            key_cmks: #specify the secret
+            store_cmks: #specify the secret
+            key_alias: #specify the alias name
+        pem:
+          remote:
+            server:
+              enabled: false #enable to use pem key
+              pem_key: #Provide the pemKey
+              pemKeySecret: #secret for pemkey
+              base_directory:
+                path: #Provide the base directory path
+              session_timeout: 5000 #Time in milliseconds
+          datasource:
+            url: jdbc:db2://pemdb.${PEM_NS}.svc:50000/PEMDB #Datbase url example jdbc::thin:@DBHostname:1521/DBName
+            username: DB2INST1 #Specify the database username
+            cmks: ${PEM_SECRET} #Provide the sceret name
+            driver_class_name: com.ibm.db2.jcc.DB2Driver #Provide db driver class name Ex: .jdbc.driver.
+          api_ws:
+            active: true
+            base_url: #specify the url
+            username: PEMUsername
+            cmks: ${PEM_SECRET} #specify the secret name
+        file:
+          archive:
+            scheduler:
+              cron: "0 0 0 ? * * *" #"0 0 0 ? * * *" #At 00:00:00am every day, "* * * * * ? *" Every second
+              delete_files_job:
+                active: false
+                script_file_loc: /usr/CMArchiveDelete.sh #Absolute path of Delete script file
+            pgp:
+              enabled: false #enable to use pgp key
+              private_key: #provide the pgp key name
+              privateKeySecret: #specify the pgp secret
+              cmks: #PGP key passphrase secret
+            aes:
+              secret_key: 3p+KB8sEYgX7R6Jh0MJRSQ==
+              salt: 9XboGbY6CkAqYi6WB2tTiQ==
+        ssomigration:
+          enable: false #enbale to start the migration
+          data:
+            action: EXPORT  #Actions:  EXPORT, MIGRATE, REPORT
+            file_name: pcm_user #File name which will be used in EXPORT, MIGRATE, and REORT Actions
+        loggerLevel: INFO #set the value to generate logs accepted values INFo , ERROR, DEBUG
+
+        sso_ssp_seas:
+          enable: false
+          ssp:
+            logout_endpoint: /Signon/logout.html #SSP Logout endpoint ,default value is : /Signon/logout.html
+            user_header_name: SM_USER #User header name config in SSP, default value is : SM_USER
+            token_cookie_name: SSOTOKEN #Token cookie name config in SSP, default value is : SSOTOKENS
+          seas:
+            auth_profile: communityManager #Authentication Profile Name in SEAS
+            host: SEAS_Host #SEAS Host Name
+            port: SEAS_Port #SEAS Port
+            ssl:
+              enabled: false #SSL enable or not in SEAS
+              protocol: #SEAS Protocol (Optional)
+              cipher_suits:  #SEAS Cipher Suits (Optional)
+              trust_store:
+                name: keystore.p12 #SEAS truststore file name
+                secretName: #secret for truststore
+                cmks: #truststore_Password secret #SEAS truststore password
+                alias: seasssl_sso #SEAS truststore alias
+                type: PKCS12 #SEAS truststore type
+              key_store:
+                name: keystore.p12 #SEAS keystore file name
+                secretName: #secret for truststore
+                cmks: #keystore_Password secret #SEAS keystore password.
+                alias: community_manager #SEAS keystore alias
+                type: PKCS12 #SEAS keystore type
+          user_request:
+            user: #Custom properties config in SEAS
+              email: email #Email property name config in SEAS
+              role: role #Role property name config in SEAS
+              first_name: firstName #FirstName property name config in SEAS
+              last_name: lastName #LastName property name config in SEAS
+              phone: phone #Phone property name config in SEAS
+              external_id: externalId #FirstName property name config in SEAS
+              preferred_language: prefferedLanguage #Language property name config in SEAS(Optional)
+            user_roles: #LDAP roles mapping to PCM (CM Role - LDAP Role)
+              super_admin: superAdmin #specify the ldap role name for super_admin
+              admin: admin #specify the ldap role name for super_admin
+              on_boarder: creator #specify the ldap role name for admin
+              business_admin: bAdmin #specify the ldap role name for on_boarder
+              business_user: bUser #specify the ldap role name for business_user
+              data_processor: processor #specify the ldap role name for data_processor
+              data_processor_restricted: processorRes #specify the ldap role name for data_processor_restricted
+      replicacount: 1 #specify the number of pods to be deployed
+      autoscaling:
+        enabled: false #set to true if autoscaling of pods to be allowed
+        minReplicas: 1 #set the mimimun number of pods
+        maxReplicas: 2 #set the maximum number of pods to be scaled up
+        targetCPUUtilizationPercentage: 85 #set the limit of cpu utilization for autoscaling
+      resources:
+        requests:
+          memory: "2Gi" #specify the memory request as needed
+          cpu: "1000m"  #specify the cpu cores request as needed
+          ephemeral-storage: 2Gi
+        limits:
+          memory: "4Gi" #specify the maximimum memory a pod can utilize
+          cpu: "2000m" #specify the maximimum cpu a pod can utilize
+          ephemeral-storage: 3Gi
+      readinessProbe:
+        initialDelaySeconds: 10 #set the initial delay to start readiness testing of pod in seconds
+        periodSeconds: 60 #set the time interval to perdorm readiness checks
+      livenessProbe:
+        initialDelaySeconds: 60 #set the initial delay to start liveness testing of pod in seconds
+        timeoutSeconds: 30
+        periodSeconds: 60 #set the time interval to perdorm liveness checks
+        successThreshold: 1
+        failureThreshold: 3
+      hostname: #specify the route dns host to access Partner Provisioner if not set default hostname will be generated
+      archive:
+        enable: false #set to true to enable persistent volume for archive
+        capacity: 100Mi
+        storageclass: slow

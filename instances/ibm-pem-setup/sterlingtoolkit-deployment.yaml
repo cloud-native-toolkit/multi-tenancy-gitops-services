@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "278"
+  name: sterlingtoolkit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sterlingtoolkit
+  template:
+    metadata:
+      labels:
+        app: sterlingtoolkit
+    spec:
+      containers:
+      - name: sterlingtoolkit
+        image: quay.io/hollisc/sterlingtoolkit:1.0.6
+        command: ["/bin/bash", "-ce", "set -x && cd /var/nfs-data/resources && cp /temp/db2jcc4.jar . && mkdir dbdrivers && mkdir pcm && chmod 777 * && cp db2jcc4.jar dbdrivers  && cp db2jcc4.jar pcm && tail -f /dev/null"]
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /var/nfs-data/resources
+          name: volume
+      volumes:
+      - name: volume
+        persistentVolumeClaim:
+          claimName: ibm-pem-resources-pvc
