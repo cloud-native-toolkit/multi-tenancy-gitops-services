@@ -1,0 +1,22 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "275"
+  name: ibm-sccm-input-pvc
+  # labels:
+  #   app.kubernetes.io/component: sccm-input
+  #   app.kubernetes.io/instance: ibm-sccm
+  #   app.kubernetes.io/managed-by: Helm
+  #   app.kubernetes.io/name: sccm-input
+  #   helm.sh/chart: ibm-sccm
+  #   release: ibm-sccm
+  namespace: sccm
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: ${RWX_STORAGECLASS}
+  volumeMode: Filesystem

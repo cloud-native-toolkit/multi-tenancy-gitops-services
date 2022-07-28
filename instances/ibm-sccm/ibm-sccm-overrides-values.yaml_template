@@ -1,0 +1,211 @@
+service-account:
+  name: sccm
+  create: false
+  sccs: ["anyuid"]
+
+ibm-sccm:
+  # Default values for mychart.
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates.
+
+  replicaCount: 1 
+
+  image:
+    repository: ${SCCM_REPO}
+    tag: ${SCCM_TAG}
+    imageSecrets: ${SCCM_PULLSECRECT}
+    digest:
+      enabled: false
+      value: "" 
+    pullPolicy: IfNotPresent
+
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    create: false
+    name: sccm
+
+  service:
+    type: ClusterIP
+    externalTrafficPolicy: ""
+    sessionAffinity: "ClientIP"
+    swingConsole:
+      name: "swing-console"
+      port: 58080
+      protocol: "TCP"
+    webConsole:
+      name: "web-console"
+      port: 58082
+      protocol: "TCP"
+    swingConsoleSecure:
+      name: "swing-console-secure"
+      port: 58081
+      protocol: "TCP"
+    webConsoleSecure:
+      name: "web-console-secure"
+      port: 58083
+      protocol: "TCP"
+    externalIP: ""
+    # Specify this to set annotations 
+    annotations: {}
+      #service.kubernetes.io/ibm-load-balancer-cloud-provider-ip-type: public
+      #service.kubernetes.io/ibm-load-balancer-cloud-provider-name: cm
+      #service.kubernetes.io/ibm-load-balancer-cloud-provider-zone: main01  
+
+  ccArgs:
+    appUserUID: "1010"
+    appUserGID: "1010"
+    ccInterval: "2h"
+    nprocLimit: "1048576"
+    nofileLimit: "1048576"
+
+    #Control center database information
+    productEntitilement: "CCD,CCM"
+    dbType: ${DBTYPE}
+    dbHost: ${DBHOST}
+    dbPort: ${DBPORT}
+    dbUser: ${DBUSER}
+    dbName: ${DBDATA}
+    dbLoc: "none"
+    dbInit: "true"
+    dbPartition: "false"
+    dbDrivers: ${DBDRIVER}
+    mssqlGlobal: "false"
+  
+    weblistenAddress: "0.0.0.0"
+    webHost: ${CLUSTER_DOMAIN}
+    autoStopJavaWebAppServer: "true"
+    eventRepositoryAuth: "false"
+    
+    #Email related details
+    emailHostname: ${EMAIL_HOST_NAME}
+    emailPort: ${EMAIL_PORT}
+    emailUser: ${EMAIL_USER}
+    emailRespond: ${EMAIL_RESPOND}
+    ccAdminEmailAddress: ${CC_ADMIN_EMAIL_ADDRESS}
+    
+    oracleRacOrScan: ""
+    
+    #JMS related details
+    jmsEnable: "false"
+    jmsType: ""
+    jmsHost: ""
+    jmsPort: ""
+    jmsQueueManager: ""
+    jmsChannel: ""
+    jmsSubject: ""
+    jmsTopic: ""
+    jmsEmbedBroker: ""
+    jmsDataDirectory: ""
+    jmsTimeToLive: ""
+    jmsRetries: ""
+    jmsRetryWait: ""
+    jmsBrokerName: ""
+    
+    #Secure parameters
+    dbSSL: ""
+      
+    # Keystore and truststore configuration
+    #keyStore: "/app/CC/user_inputs/keystore.jks"
+    #trustStore: "/app/CC/user_inputs/truststore.jks"
+    keyAlias: ${KEY_ALIAS}
+    adminEmailAddress: ${ADMIN_EMAIL_ADDRESS}
+
+    #Seas Parameters
+    packagePath: "../packages"
+    seasPrimaryAddress: ""
+    seasPrimaryPort: ""
+    seasAlternativeAddress: ""
+    seasAlternativePort: ""
+    seasSecureConnection: "N"
+    seasProfileName: "test"
+    seasPersistentConnection: "N"
+    seasSecureProtocol: ""
+
+  resources: 
+    limits:
+      cpu: 3000m
+      memory: 4Gi
+    requests:
+      cpu: 1500m
+      memory: 2Gi
+
+  initResources:
+    limits:
+      cpu: 500m
+      memory: 2Gi
+    requests:
+      cpu: 250m
+      memory: 1Gi
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution: []
+      preferredDuringSchedulingIgnoredDuringExecution: []
+
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution: []
+      preferredDuringSchedulingIgnoredDuringExecution: []
+
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution: []
+      preferredDuringSchedulingIgnoredDuringExecution: []
+
+  #persistence Volume
+  persistentVolumeCCM:
+    claimName: "ibm-sccm-pvc"
+    storageClassName: ""
+    size: 
+    enabled: false
+    useDynamicProvisioning: false
+    accessMode: ""
+    selector:
+      label: ""
+      value: ""
+
+  persistentVolumeUserInputs:
+    claimName: "ibm-sccm-input-pvc"
+    storageClassName: ""
+    size: 
+    enabled: false
+    accessMode: ""
+    selector:
+      label: ""
+      value: ""
+  # liveness and Probeness
+  livenessProbe:
+    initialDelaySeconds: 175
+    timeoutSeconds: 45
+    periodSeconds: 120
+
+  readinessProbe:
+    initialDelaySeconds: 175
+    timeoutSeconds: 15
+    periodSeconds: 120
+    
+  secret:
+    secretName:  "ibm-sccm-secret"
+    certsSecretName: "ibm-sccm-jks-certs-secret"
+
+  dashboard:
+    enabled: true
+
+  route:
+    enabled: true
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 2
+    targetCPUUtilizationPercentage: 60
+
+  arch: "amd64"
+
+  # Change license to true to indicate that you have read and agree to license agreements
+  # Refer: http://www-03.ibm.com/software/sla/sladb.nsf (L/N: L-KNAN-C6VGE3)
+  license: true
+
+  # Specify the license edition as per license agreement. Valid value is prod or non-prod for Production and 
+  # Non-production respectively. Remember that this parameter is crucial for IBM Licensing and Metering Service
+  licenseType: non-prod

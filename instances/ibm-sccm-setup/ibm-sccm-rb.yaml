@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "280"
+  name: "ibm-sccm-psp"
+  labels:
+    app: "ibm-sccm-psp"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ibm-sccm-psp"
+subjects:
+- kind: ServiceAccount
+  name: sccm
+  namespace: sccm
