@@ -1,0 +1,33 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "280"
+  name: "ibm-sccm-scc"
+  labels:
+    app: "ibm-sccm-scc"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ibm-sccm-scc"
+subjects:
+- kind: ServiceAccount
+  name: sccm
+  namespace: sccm
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "280"
+  name: "default-anyuid-scc"
+  labels:
+    app: "ibm-sccm-scc"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ibm-sccm-anyuid-scc"
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: sccm
