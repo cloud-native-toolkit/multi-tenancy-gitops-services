@@ -135,7 +135,7 @@ ibm-pem-standard-vbudi:
 
       testmode_db_port: 50000 ## Specify the database details for the test mode schema. These properties enable you to start the following docker containers: IBM PEM, Partner Provisioner, Migrator, Master key regenerator, and DBUtils. Specify the port
       testmode_db_host: pemtest.${PEM_NS}.svc # Specify the database host
-      testmode_db_name: pemdb #Specify the Database Name
+      testmode_db_name: pemtest #Specify the Database Name
       testmode_db_schema: DB2INST2 #Specify the Database Schema
       testmode_db_user: DB2INST1 # Specify the databse user name
       #Provide the secret name
