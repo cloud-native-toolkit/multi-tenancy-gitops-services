@@ -1,0 +1,19 @@
+resources:
+#  - ./project.yaml
+  - ./pvc.yaml
+  - ./sa.yaml
+  - ./service.yaml
+  - ./statefulset.yaml
+  - ./scc.yaml
+
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "405"
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+- name: create-schema
+  behavior: create
+  files:
+    - create_schema.sh

@@ -1,0 +1,32 @@
+{
+    "addon_type":"dv",
+    "display_name":"dv-instance",
+    "namespace":"tools",
+    "addon_version":"1.7.8",
+    "create_arguments":{
+       "parameters":{
+          "resources.dv.requests.cpu": "4",
+          "resources.dv.requests.memory": "16Gi",
+          "image.pullPolicy": "IfNotPresent",
+          "workerCount": "1",
+          "enableHostIPC": "true",
+          "persistence.storageClass": "managed-nfs-storage",
+          "persistence.workerpv.storageClass": "managed-nfs-storage",
+          "persistence.cachingpv.storageClass": "managed-nfs-storage",
+          "persistence.size": "50Gi",
+          "persistence.workerpv.size": "25Gi",
+          "persistence.cachingpv.size": "50Gi"
+       },
+       "resources":{
+          "cpu":"4",
+          "memory":"16Gi"
+       },
+       "description":"Data Virtualization",
+       "metaData":{
+
+       }
+    },
+    "transientFields":{
+
+    }
+ }

@@ -1,0 +1,17 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: custom-cpd-demo-sa
+rules:
+  - verbs:
+      - '*'
+    apiGroups:
+      - ''
+    resources:
+      - secrets
+  - verbs:
+      - '*'
+    apiGroups:
+      - 'zen.cpd.ibm.com'
+    resources:
+      - zenservices

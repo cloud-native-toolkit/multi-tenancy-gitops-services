@@ -1,0 +1,22 @@
+{
+  "username": "dataengineer-auto",
+  "displayName": "DataEngineer-auto",
+  "email": "dataengineer@example.com",
+  "permissions": [
+    "create_project",
+    "author_governance_artifacts",
+    "view_governance_artifacts",
+    "can_provision",
+    "access_catalog",
+    "view_quality",
+    "manage_information_assets",
+    "manage_metadata_import",
+    "manage_discovery",
+    "manage_quality",
+    "create_space"
+  ],
+  "user_roles": [
+    "zen_data_engineer_role"
+  ],
+  "password":"passw0rd!"
+}

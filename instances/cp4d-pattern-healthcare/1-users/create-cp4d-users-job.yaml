@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-cp4d-users
+spec:
+  selector: {}
+  template:
+    metadata:
+      name: create-cp4d-users
+    spec:
+      containers:
+        - name: create-cp4d-users
+          image: quay.io/hollisc/cp4d-cli:2.0.4
+          command: [ "/bin/bash", "-c", "cpd-scripts/create-users.sh" ]
+          #command: [ "/bin/bash", "-c", "--" ]
+          #args: [ "while true; do sleep 30; done;" ]
+          volumeMounts:
+          - name: cp4d-users
+            mountPath: /cpd-resources
+          - name: cp4d-scripts
+            mountPath: /cpd-scripts
+      securityContext:
+        runAsUser: 1010
+      serviceAccountName: cpd-demo-sa
+      restartPolicy: Never
+      volumes:
+      - name: cp4d-users
+        projected:
+          sources:
+          - configMap:
+              name: cp4d-users
+              items:
+                - key: user-dataengineer.json
+                  path: user-dataengineer.json
+                - key: user-datascientist.json
+                  path: user-datascientist.json
+                - key: user-datasteward.json
+                  path: user-datasteward.json
+      - name: cp4d-scripts
+        configMap:
+          name: cp4d-scripts
+          defaultMode: 0777

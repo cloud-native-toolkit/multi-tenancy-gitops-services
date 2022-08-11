@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-cp4d-datastage-flow
+spec:
+  selector: {}
+  template:
+    metadata:
+      name: create-cp4d-dv-instance
+    spec:
+      containers:
+        - name: create-cp4d-datastage-flow
+          image: quay.io/hollisc/cp4d-cli:2.0.4
+          command: [ "/bin/bash", "-c", "cpd-scripts/create-cp4d-datastage-flow.sh " ]
+          # command: [ "/bin/bash", "-c", "--" ]
+          # args: [ "while true; do sleep 30; done;" ]
+          volumeMounts:
+          - name: cp4d-datastage-flow
+            mountPath: /cpd-resources
+          - name: create-cp4d-datastage-flow
+            mountPath: /cpd-scripts
+      securityContext:
+        runAsUser: 1010
+      serviceAccountName: cpd-demo-sa
+      restartPolicy: Never
+      volumes:
+      - name: cp4d-datastage-flow
+        projected:
+          sources:
+          - configMap:
+              name: cp4d-datastage-flow
+              items:
+                - key: Healthcare-Data-Stage-Project.zip
+                  path: Healthcare-Data-Stage-Project.zip
+      - name: create-cp4d-datastage-flow
+        configMap:
+          name: create-cp4d-datastage-flow
+          defaultMode: 0777

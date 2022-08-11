@@ -1,0 +1,6 @@
+bases:
+- 1-users
+- 2-datasources
+- 3-data-stage-project
+- 4-data-governance-artifacts
+- 5-data-virtualization-instance

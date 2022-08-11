@@ -1,0 +1,24 @@
+{
+  "username": "datasteward-auto",
+  "displayName": "DataSteward-auto",
+  "email": "DataSteward@example.com",
+  "permissions": [
+    "create_project",
+    "manage_information_assets",
+    "manage_metadata_import",
+    "manage_discovery",
+    "manage_quality",
+    "view_governance_artifacts",
+    "author_governance_artifacts",
+    "access_catalog",
+    "create_space",
+    "view_quality",
+    "manage_catalog",
+    "manage_categories"
+  ],
+  "user_roles": [
+    "wkc_data_quality_analyst_role",
+    "wkc_data_steward_role"
+  ],
+  "password":"passw0rd!"
+}
