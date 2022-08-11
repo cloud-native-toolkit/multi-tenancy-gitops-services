@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-cp4d-dv-instance
+spec:
+  selector: {}
+  template:
+    metadata:
+      name: create-cp4d-dv-instance
+    spec:
+      containers:
+        - name: create-cp4d-dv-instance
+          image: quay.io/hollisc/cp4d-cli:2.0.4
+          command: [ "/bin/bash", "-c", "cpd-scripts/create-cp4d-dv-instance.sh " ]
+          # command: [ "/bin/bash", "-c", "--" ]
+          # args: [ "while true; do sleep 30; done;" ]
+          volumeMounts:
+          - name: cp4d-dv-instance-artifacts
+            mountPath: /cpd-resources
+          - name: create-cp4d-dv-instance
+            mountPath: /cpd-scripts
+      securityContext:
+        runAsUser: 1010
+      serviceAccountName: cpd-demo-sa
+      restartPolicy: Never
+      volumes:
+      - name: cp4d-dv-instance-artifacts
+        projected:
+          sources:
+          - configMap:
+              name: cp4d-dv-instance-artifacts
+              items:
+                - key: dv-instance.json
+                  path: dv-instance.json
+      - name: create-cp4d-dv-instance
+        configMap:
+          name: create-cp4d-dv-instance
+          defaultMode: 0777

@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-cp4d-data-governance-artifacts
+spec:
+  selector: {}
+  template:
+    metadata:
+      name: create-cp4d-data-governance-artifacts
+    spec:
+      containers:
+        - name: create-cp4d-data-governance-artifacts
+          image: quay.io/hollisc/cp4d-cli:2.0.4
+          command: [ "/bin/bash", "-c", "cpd-scripts/create-cp4d-data-governance-artifacts.sh " ]
+          # command: [ "/bin/bash", "-c", "--" ]
+          # args: [ "while true; do sleep 30; done;" ]
+          volumeMounts:
+          - name: cp4d-data-governance-artifacts
+            mountPath: /cpd-resources
+          - name: cp4d-data-governance-artifacts-scripts
+            mountPath: /cpd-scripts
+      securityContext:
+        runAsUser: 1010
+      serviceAccountName: cpd-demo-sa
+      restartPolicy: Never
+      volumes:
+      - name: cp4d-data-governance-artifacts
+        projected:
+          sources:
+          - configMap:
+              name: cp4d-data-governance-artifacts
+              items:
+                - key: data-governance-artifacts.zip
+                  path: data-governance-artifacts.zip
+      - name: cp4d-data-governance-artifacts-scripts
+        configMap:
+          name: cp4d-data-governance-artifacts-scripts
+          defaultMode: 0777

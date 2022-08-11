@@ -1,0 +1,22 @@
+resources:
+# - sa.yaml
+# - role.yaml
+# - rolebinding.yaml
+# - anyuid-rolebinding.yaml
+- create-cp4d-datastage-flow-job.yaml
+
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "410"
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+- name: cp4d-datastage-flow
+  behavior: create
+  files:
+    - Healthcare-Data-Stage-Project.zip
+- name: create-cp4d-datastage-flow
+  behavior: create
+  files:
+    - create-cp4d-datastage-flow.sh

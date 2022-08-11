@@ -1,0 +1,15 @@
+{
+  "username": "datascientist-auto",
+  "displayName": "DataScientist-auto",
+  "email": "datascientist@example.com",
+  "permissions": [
+    "access_catalog",
+    "create_project",
+    "create_space",
+    "view_governance_artifacts"
+  ],
+  "user_roles": [
+    "wkc_data_scientist_role"
+  ],
+  "password":"passw0rd!"
+}
