@@ -43,7 +43,7 @@ spec:
           tcpSocket:
             port: 50000
           failureThreshold: 30
-          periodSeconds: 300
+          periodSeconds: 600
       securityContext:
         fsGroup: 1000
       volumes:
