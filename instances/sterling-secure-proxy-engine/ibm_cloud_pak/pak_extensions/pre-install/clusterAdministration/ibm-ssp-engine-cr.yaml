@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "ibm-ssp-engine-psp"
+  labels:
+    app: "ibm-ssp-engine-psp"
+rules:
+- apiGroups:
+  - policy
+  resourceNames:
+  - ibm-ssp-engine-psp
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use

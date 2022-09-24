@@ -1,0 +1,62 @@
+{{- include "sch.config.init" (list . "ibm-ssp-engine.sch.chart.config.values") }}
+{{ $appName := include "sch.names.appName" (list . "test") }}
+{{ $fullName := include "sch.names.fullName" (list .) }}
+{{ $saName := include "sch.names.fullCompName" (list . "serviceaccount") }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ $fullName | quote }}
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-delete-policy": hook-succeeded
+{{- include "sch.metadata.annotations.metering" (list . .sch.chart.metering "" "" nil) | indent 4 }}
+  labels:
+    app.kubernetes.io/name: {{  $appName  }}-test
+    app.kubernetes.io/instance: {{  .Release.Name  }}
+    app.kubernetes.io/managed-by: {{  .Release.Service  }}
+    helm.sh/chart: {{  include "ibm-ssp-engine.chart" .  }}
+    release: {{  .Release.Name  }}
+spec:
+  restartPolicy: Never
+  {{- if .Values.serviceAccount.create }}
+  serviceAccountName: {{ $saName }}
+  {{- else }}
+  serviceAccountName: {{ .Values.serviceAccount.name | default "default" }}
+  {{- end }}
+  hostNetwork: false
+  hostPID: false
+  hostIPC: false
+  securityContext:
+{{ include "sch.security.securityContext" (list . .sch.chart.podSecurityContext) | indent 4 }}
+  affinity:
+{{- include "ibm-ssp-engine.nodeAffinity" (list . .Values.affinity.nodeAffinity) | indent 8 }}
+ 
+  containers:
+  - name: {{  .Chart.Name  }}
+    {{- if .Values.image.digest.enabled }}
+    image: "{{  .Values.image.repository  }}@{{ .Values.image.digest.value }}"
+    {{- else }}
+    image: "{{  .Values.image.repository  }}:{{ .Values.image.tag  }}"
+    {{- end }}
+    imagePullPolicy: {{ .Values.image.pullPolicy }}
+    securityContext:
+{{ include "sch.security.securityContext" (list . .sch.chart.initContainerSecurityContext) | indent 8 }}
+    command: ["/bin/sh", "-c", "ret=`cat bin/startEngine.out | grep 'ready for Service'` ; if [[ -n $ret ]]; then echo 'SSP Engine installation is successful and application is running.' ; else echo 'SSP Engine is not running.' ; fi"]
+    resources:
+      limits:
+{{ toYaml .Values.resources.limits | indent 14 }}
+      requests:
+{{ toYaml .Values.resources.requests | indent 14 }}
+    volumeMounts:
+    - mountPath: /spinstall/IBM/SP
+      name: engine-pvc
+      subPath: ENGINE  
+  volumes:
+  - name: engine-pvc
+    persistentVolumeClaim:
+      {{- if .Values.persistentVolume.existingClaimName }}
+      claimName: {{ .Values.persistentVolume.existingClaimName }}
+      {{- else }}
+      claimName: {{  $fullName  }}-pvc
+      {{- end }}
+

@@ -1,0 +1,19 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: ibm-ssp-cm-pv
+  labels:
+    app.kubernetes.io/name: ibm-ssp-cm-pv
+    app.kubernetes.io/instance: cm-release
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ibm-ssp-cm-1.2.3
+    release: cm-release
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 2Gi # Storage capacity for this PV
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    server: 10.120.136.100
+    path: /nfs_volume

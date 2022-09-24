@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: "ibm-ssp-engine-psp"
+  labels:
+    app: "ibm-ssp-engine-psp"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ibm-ssp-engine-psp"
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: system:serviceaccounts
+  namespace: {{ NAMESPACE }}

@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: keycert-sync-
+  namespace: ssp
+  annotations:
+    argocd.argoproj.io/sync-wave: "285"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      serviceAccountName: ssp-argocd-hook-job
+      containers:
+      - name: keycert-sync
+        image: quay.io/openshift/origin-cli:latest
+        command: ["bash"]
+        args:
+          - -c
+          - "oc rsync ibm-ssp-cm-ibm-ssp-cm-0:defkeyCert.txt /tmp/;sleep 5;oc create secret generic -n ssp engine-key-cert --from-file=keyCert=./tmp/defkeyCert.txt --dry-run=client -o yaml | oc apply -f -"
+      restartPolicy: OnFailure
+  backoffLimit: 2

@@ -1,0 +1,73 @@
+{{- include "sch.config.init" (list . "ibm-ssp-engine.sch.chart.config.values") }}
+{{ $appName := include "sch.names.appName" (list .) }}
+{{ $fullName := include "sch.names.fullName" (list .) }}
+{{ $saName := include "sch.names.fullCompName" (list . "serviceaccount") }}
+
+{{- if or (.Values.service2.ports) (.Values.service2.portRanges) }}
+{{- $serviceType := .Values.service2.type }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $fullName }}-2
+  labels: 
+    app.kubernetes.io/name: {{ $appName }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ include "ibm-ssp-engine.chart" . }}
+    release: {{ .Release.Name }}
+    author: IBM
+  {{- if .Values.service2.annotations }}
+  annotations:
+{{ toYaml .Values.service2.annotations | indent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{  $appName  }}
+    app.kubernetes.io/instance: {{  .Release.Name  }}
+    release: {{ .Release.Name }}
+    author: IBM
+  type: {{  .Values.service2.type  }}
+  {{- if .Values.service2.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service2.loadBalancerIP }}
+  {{- end }}
+  ports:
+    {{- if .Values.service2.portRanges }}
+    {{- range $i, $portRange := .Values.service2.portRanges }}
+    {{- $portRangeNumbers := split "-" $portRange.portRange }}
+    {{- $nodePort := 0 }}
+    {{- if $portRange.nodePortRange }}
+    {{- $nodePortRangeNumbers := split "-" $portRange.nodePortRange }}
+    {{- $nodePort = $nodePortRangeNumbers._0 }}
+    {{- end }}
+    {{- $count := 0 }}
+    {{- range untilStep ($portRangeNumbers._0|int) ((add ($portRangeNumbers._1|int) 1)|int) 1 }}
+    {{- $count = add $count 1 }}
+    - name: {{ $portRange.name }}-{{ $count }}
+      port: {{ . }}
+      {{- if and (eq $serviceType "NodePort") ($portRange.nodePortRange) }}
+      nodePort: {{ $nodePort }}
+      {{- $nodePort = add $nodePort 1 }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- if .Values.service2.ports }}
+    {{- range $i, $port := .Values.service2.ports }}
+    - name: {{ $port.name }}
+      port: {{ $port.port }}
+      {{- if and (eq $serviceType "NodePort") ($port.nodePort) }}
+      nodePort: {{ $port.nodePort }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+  {{- if .Values.service2.sessionAffinity }}
+  sessionAffinity: {{ .Values.service2.sessionAffinity }}
+  {{- end }}
+  {{- if .Values.service2.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.service2.externalTrafficPolicy }}
+  {{- end }}
+  {{- if .Values.service2.externalIP }}
+  externalIPs:
+    - {{ .Values.service2.externalIP }}
+  {{- end }}
+{{- end }}

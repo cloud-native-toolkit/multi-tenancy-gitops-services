@@ -1,0 +1,57 @@
+{{- include "sch.config.init" (list . "ibm-ssp-cm.sch.chart.config.values") }}
+{{ $appName := include "sch.names.appName" (list .) }}
+{{ $fullName := include "sch.names.fullName" (list .) }}
+{{ $saName := include "sch.names.fullCompName" (list . "serviceaccount") }}
+kind: ConfigMap 
+apiVersion: v1 
+metadata:
+  name: {{ $fullName }}
+  annotations:
+        # This is what defines this resource as a hook. Without this line, the
+        # job is considered part of the release.
+        "helm.sh/hook": "pre-install, pre-upgrade, pre-rollback"
+        "helm.sh/hook-weight": "0"
+        "helm.sh/hook-delete-policy": "before-hook-creation"
+  labels:
+    app.kubernetes.io/name: {{ $appName }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ include "ibm-ssp-cm.chart" . }}
+    release: {{ .Release.Name }}
+data:
+  # Configuration values can be set as key-value properties
+  cm_config_file: |
+    licenseAccepted=true
+    port={{  .Values.service.cm.containerPort  }}
+    jettyPort={{  .Values.service.jetty.containerPort  }}
+    keyCertExport={{  .Values.cmArgs.keyCertExport  }}
+    keyCertFileName=defkeyCert.txt
+    {{- if .Values.secret.keyCertSecretName }}
+    keyCertSecretEnabled=true
+    {{- end }}
+    keyCertAliasName={{  .Values.cmArgs.keyCertAliasName  }}
+    helmChartEnabled=true
+    maxHeapSize={{  .Values.cmArgs.maxHeapSize  }}
+    customCertEnabled={{  .Values.customCertificate.customCertEnabled  }}
+    commonCertFile={{  .Values.customCertificate.commonCertFile  }}
+    commonCertAlias={{  .Values.customCertificate.commonCertAlias  }}
+    commonKeyCertFile={{  .Values.customCertificate.commonKeyCertFile  }}
+    {{- if .Values.customFiles }}
+    {{- range .Values.customFiles }}
+    customFiles={{ . }}
+    {{- end }}
+    {{- end }} 
+    
+  {{- if .Values.customProperties }}
+  cm_custom_config_file: | 
+    {{- range .Values.customProperties }}
+    {{ . }}
+    {{- end }}
+  {{- end }}
+  {{- if .Values.vmArguments }}
+  cm_vm_config_file: | 
+    {{- range .Values.vmArguments }}
+    {{ . }}
+    {{- end }}
+  {{- end }}
+ 
