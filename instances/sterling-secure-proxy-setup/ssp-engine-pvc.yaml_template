@@ -16,4 +16,4 @@ spec:
   resources:
     requests:
       storage: 2Gi
-  storageClassName: ibmc-file-silver
+  storageClassName: ${RWX_STORAGECLASS}

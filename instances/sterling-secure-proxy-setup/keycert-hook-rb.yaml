@@ -1,15 +1,15 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
-  name: "ibm-ssp-cm-psp"
-  labels:
-    app: "ibm-ssp-cm-psp"
+  annotations:
+    argocd.argoproj.io/sync-wave: "225"
+  name: keycert-rb
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: "ibm-ssp-cm-psp"
+  kind: Role
+  name: keycert-hook-role
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
   name: system:serviceaccounts
-  namespace: {{ NAMESPACE }}
+  namespace: ssp

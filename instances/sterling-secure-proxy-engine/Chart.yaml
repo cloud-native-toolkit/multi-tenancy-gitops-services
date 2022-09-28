@@ -1,27 +1,13 @@
 apiVersion: v2
-appVersion: 6.0.3.0.02
+appVersion: 1.0.0
 dependencies:
 - alias: sch
   name: ibm-sch
-  repository: '@sch'
+  repository: https://charts.cloudnativetoolkit.dev
   version: ^1.2.18
-description: 'A Helm chart to deploy IBM Sterling Secure Proxy - Engine on a containerized
-  platform. Documentation For additional details regarding install parameters check
-  Engine Helm Chart documentation at https://www.ibm.com/docs/en/secure-proxy/6.0.3
-  License By installing this product you accept the following license terms: http://www-03.ibm.com/software/sla/sladb.nsf'
-home: https://www.ibm.com/docs/en/secure-proxy/6.0.3
-icon: https://raw.githubusercontent.com/IBM/charts/master/logo/ibm-ssp.png
-keywords:
-- amd64
-- DevOps
-- Commercial
-- Limited
-- IKS
-- RHOCP
-- Other
-kubeVersion: '>=1.19.0'
-maintainers:
-- name: IBM
-name: ibm-ssp-engine
+- name: ibm-ssp-engine
+  repository: https://raw.githubusercontent.com/IBM/charts/master/repo/ibm-helm
+  version: 1.2.3
+name: ssp-engine-gitops
 type: application
-version: 1.2.3
+version: 1.0.0
