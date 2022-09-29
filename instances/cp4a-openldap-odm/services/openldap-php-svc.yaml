@@ -1,0 +1,25 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: openldap-phpldapadmin
+  namespace: openldap
+  annotations:
+    argocd.argoproj.io/sync-wave: "240"
+spec:
+  clusterIP: 172.21.162.213
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http
+  internalTrafficPolicy: Cluster
+  clusterIPs:
+    - 172.21.162.213
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: phpldapadmin
+    release: openldap

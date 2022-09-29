@@ -1,0 +1,20 @@
+resources:
+- secrets/openldap-ltb-secret.yaml
+- secrets/openldap-stack-ha-secret.yaml
+- secrets/sh.helm.secret.yaml
+- secrets/ldap-bind-secret.yaml
+
+- configmaps/cm-customdif-stack-ha.yaml
+- configmaps/cm-openldap-phpldapadmin.yaml
+- configmaps/cm-openldap-stack-ha.yaml
+
+- roles/openldap-role.yaml
+
+- deployment/ldap-deployment.yaml
+- deployment/ldap-statefulset.yaml
+
+- services/openldap-php-svc.yaml
+- services/openldap-stack-ha-svc.yaml
+- services/stack-ha-svc.yaml
+
+- route/ldap-route.yaml

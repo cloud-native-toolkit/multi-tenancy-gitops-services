@@ -1,0 +1,4 @@
+resources:
+- odm/ibm-ban-secret.yaml
+- odm/odm-db-secret.yaml
+- odm/odm-deploy.yaml

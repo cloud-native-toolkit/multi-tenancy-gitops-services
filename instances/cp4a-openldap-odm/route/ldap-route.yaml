@@ -1,0 +1,20 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: openldap-phpldapadmin
+  namespace: openldap
+  annotations:
+    argocd.argoproj.io/sync-wave: "250"
+spec:
+  host: >-
+    openldap-phpldapadmin-openldap.itzroks-662001rtxj-un0clf-6ccd7f378ae819553d37d5f2ee142bd6-0000.us-south.containers.appdomain.cloud
+  to:
+    kind: Service
+    name: openldap-phpldapadmin
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None

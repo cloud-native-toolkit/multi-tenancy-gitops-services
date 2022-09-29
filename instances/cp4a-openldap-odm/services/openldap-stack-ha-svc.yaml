@@ -1,0 +1,25 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: openldap-openldap-stack-ha-headless
+  namespace: openldap
+  annotations:
+    argocd.argoproj.io/sync-wave: "240"
+spec:
+  clusterIP: None
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: ldap-port
+      protocol: TCP
+      port: 389
+      targetPort: ldap-port
+  internalTrafficPolicy: Cluster
+  clusterIPs:
+    - None
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: openldap-openldap-stack-ha
+    release: openldap

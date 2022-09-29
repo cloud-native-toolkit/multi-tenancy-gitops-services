@@ -1,0 +1,3 @@
+resources:
+- db2/db2-catalogsource.yaml
+- db2/db2-subscription.yaml
