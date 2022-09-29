@@ -1,0 +1,294 @@
+ibm-ssp-engine:
+  # Default values for IBM® Sterling Secure Proxy - Engine for Linux Helm Chart a.k.a IBM Certified Container Software (IBMCCS).
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates. To override the default values either change in this file or use
+  # --set option provided by helm cli.
+  # Change license to true to indicate that you have read and agree to license agreements
+  # Refer: http://www-03.ibm.com/software/sla/sladb.nsf (L/N: L-KNAN-C6EJKA)
+  license: true
+  # Specify the license edition as per license agreement. Valid value is prod or non-prod for Production and
+  # Non-production respectively. Remember that this parameter is crucial for IBM Licensing and Metering Service
+  licenseType: non-prod
+
+  # Specify the respective Docker Image details for IBMCCS
+  image:
+    # Specify the repository name along with image name
+    repository: "cp.icr.io/cp/ibm-ssp-engine/ssp-engine-docker-image"
+    # Specify the tag name for the image
+    tag: "6.0.3.0.02"
+    # Specify the image pull secret for the service, if the image is in private registry
+    imageSecrets: "ssp-imageregistrysecret"
+    # Enable true/false to use image digest
+    digest:
+      enabled: false
+      value: sha256:4cce1a919374ab95c9ea1c89a760c5a5580f7c5d509b812165e0c86236234ddc
+    # Specify respective pull policy to used to override default `IfNotPresent` policy
+    pullPolicy: IfNotPresent
+  # Currently, the only supported architecture for IBMCCS is `amd64`
+  arch: "amd64"
+
+  # Specify these fields to provide config values for Engine application
+  engineArgs:
+     # Set the value "true" to Generate Key Certificate, if you are installing Secure Proxy Engine before CM
+     # Set the value "false" to Import Key Cert Exported from Secure Proxy CM if you have installed Secure Proxy CM first
+    keyCertExport: false
+    # Certificate alias value.
+    keyCertAliasName: "keycert"
+    # JVM max heap size - don't set more than container limit resource memory.
+    maxHeapSize: "2048m"
+    # Change SSP brand name if required else keep it as it is.
+    signOnDirName: "Signon"
+
+
+  # persistence section specifies persistence volume claim settings which apply to the whole chart
+  persistentVolume:
+    # enabled is whether to use Persistent Volumes or not
+    enabled: true
+    # useDynamicProvisioning is whether or not to use Storage Classes to dynamically create Persistent Volumes
+    useDynamicProvisioning: false
+    # Specify the existing PV claim name to be used for deployment
+    existingClaimName: "ssp-engine-pvc"
+    # Specify this to use selector label name for PV-PVC bind
+    labelName: "app.kubernetes.io/name"
+    # Specify this to use selector label value for PV-PVC bind
+    labelValue: "ibm-ssp-engine-pvc"
+    # Specify this to set storage class name
+    storageClassName: "manual"
+    # Specify this to set PVC size
+    size: 2Gi
+    # Specify this to set access mode
+    accessMode: "ReadWriteOnce"
+
+  # Manage PV directory using Supplemental Group ID if needed.
+  storageSecurity:
+    supplementalGroupId: ""
+
+  # Specify these fields for Services
+  service:
+    # Specify this to set service type.
+    type: "LoadBalancer"
+    # Specify this to set load balancer IP. It's added for cloud environment.
+    loadBalancerIP: ""
+    # Specify this to set external IP to access application outside the cluster.
+    # externalIP: "158.176.163.18"
+    # Specify this to set annotations
+    annotations: {}
+      #service.kubernetes.io/ibm-load-balancer-cloud-provider-ip-type: public
+      #service.kubernetes.io/ibm-load-balancer-cloud-provider-name: engine
+      #service.kubernetes.io/ibm-load-balancer-cloud-provider-zone: main01
+
+    # Specify this to set external traffic policy
+    externalTrafficPolicy: ""
+    # Specify this to set session Affinity
+    sessionAffinity: "ClientIP"
+    engine:
+      # Engine application is accessed by using below mentioned service port, so add port as per the requirement else it would be set 63366 as default port.
+      servicePort: 63366
+      # If traditional engine port is different from 63366 while migrating from traditional to container environment then in this case
+      # we need to change container port as traditional engine port value else It is not required to change the container port value.
+      containerPort: 63366
+    psMoreSecure:
+      # More Secure Perimeter Server application is accessed by using below mentioned service port, so add the port number as per the requirement.
+      # The below mentioned service port must be used as remote port while configuring more secure perimeter server.
+      servicePort:
+
+  # Specify these fields for Adapter Services
+  # if you want to preserve client source IP then define service type as NodePort and externalTrafficPolicy as Local
+  service2:
+    # Specify this to set service type.
+    type: "LoadBalancer"
+    # Specify this to set load balancer IP. It's added for cloud environment.
+    loadBalancerIP: ""
+    # Specify this to set external IP to access application outside the cluster.
+    # externalIP: "158.175.172.178"
+    # Specify this to set annotations
+    annotations: {}
+      #service.kubernetes.io/ibm-load-balancer-cloud-provider-ip-type: public
+      #service.kubernetes.io/ibm-load-balancer-cloud-provider-name: engine
+      #service.kubernetes.io/ibm-load-balancer-cloud-provider-zone: main01
+
+    # Specify this to set external traffic policy
+    externalTrafficPolicy: ""
+    # Specify this to set session Affinity
+    sessionAffinity: "ClientIP"
+
+    # Expose adapter ports in range format if we are not using Less Secure Perimeter Server.
+    # nodePortRange - it will assign to service if you have selected service type as NodePort.
+    portRanges: []
+      #- name: ftp-adapter
+       # portRange: 30101-30110
+       # nodePortRange: 30101-30110
+      #- name: sftp-adapter
+       # portRange: 30201-30210
+       # nodePortRange: 30201-30210
+
+    # Expose adapter ports one by one if we are not using Less Secure Perimeter Server.
+    # nodePort - it will assign to service if you have selected service type as NodePort.
+    ports:
+      - name: adapter1
+        port: 30110
+       # nodePort: 30110
+      #- name: adapter2
+       # port: 30111
+       # nodePort: 30111
+      #- name: adapter3
+       # port: 30112
+       # nodePort: 30112
+
+  # Specify the Secret configuration for Engine
+  secret:
+    # Secret name for PassPhase and Password
+    secretName: "ibm-ssp-engine-secret"
+    # Secret name for Key Certificate - Use only, if you are installing Engine after Configuration Manager otherwise it's not needed.
+    keyCertSecretName: "engine-key-cert"
+
+  # Specify the service account details
+  serviceAccount:
+    # Set this field to `true` to create service account or `false` to use existing service account
+    create: false
+    # Specify the name of service account to be used
+    name: "ssp-engine-serviceaccount"
+
+
+  ## Configure resource requests and limits
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ## Container CPU -  limit and request both are set 1 CPU(1000m) as default value but we can modify as per the requirement.
+  ## Container Memory - limit and request both are set 3 GB as default value but we can modify as per the requirement.
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 3Gi
+      ephemeral-storage: "6Gi"
+    requests:
+      cpu: 1000m
+      memory: 3Gi
+      ephemeral-storage: "4Gi"
+
+  affinity:
+    # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature
+    # The matchExpression for key 'kubernetes.io/arch' is automatically added based on
+    # architecture preference specified in 'arch'
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution: []
+    #    nodeSelectorTerms:
+    #    - matchExpressions:
+    #      - key: kubernetes.io/e2e-az-name
+    #        operator: In
+    #        values:
+    #        - e2e-az1
+    #        - e2e-az2
+  # The matchExpression for key 'kubernetes.io/arch' is automatically added based on
+  # architecture preference specified in 'arch'
+      preferredDuringSchedulingIgnoredDuringExecution: []
+
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution: []
+      preferredDuringSchedulingIgnoredDuringExecution: []
+
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution: []
+      preferredDuringSchedulingIgnoredDuringExecution: []
+
+  # liveness and readiness Probe
+  livenessProbe:
+    initialDelaySeconds: 200
+    timeoutSeconds: 30
+    periodSeconds: 60
+    failureThreshold: 10
+
+  readinessProbe:
+    initialDelaySeconds: 190
+    timeoutSeconds: 5
+    periodSeconds: 60
+    failureThreshold: 10
+
+  # Set this to true to create route in OpenShift cluster
+  route:
+    enabled: true
+
+  # Set this to true to create Monitoring Dashboard for IBMCCS
+  dashboard:
+    enabled: false
+
+
+  # The following files can be customized using key value pair in the list format.
+  # bin/log.properties, bin/security.properties, bin/perimeter.properties, bin/cdsp.properties, bin/portal/mediatypes.properties
+  # bin/portal/pages.properties, conf/log4j.properties
+  # Add/Update: Key and Value both must be provided in the below format.
+  # <File Name Without Extension>_<Property Name>=<Property Value>
+  customProperties: []
+  # below is the example:
+  #customProperties:
+  #  - log_audit.log.maxfilesize=10MB
+  #  - perimeter_conduitStreamPair.bufferSize=500K
+
+
+  # Add/Update VM arguments in the list format
+  # <Key as Java property name>=<value>
+  vmArguments: []
+  # below is the example:
+  #vmArguments:
+  #  - Djavax.net.debug=ssl,handshake,data,trustmanager
+  #  - Xdump:java+heap:events=user
+
+
+  # Use to import custom certificate which was exported from the CM.
+  # set the value "true" to import the custom certificate.
+  # set the value "false" to not import the custom certificate.
+  customCertificate:
+    customCertEnabled: false
+    # set alias name
+    commonCertAlias: ""
+    # set key certificate file name which was exported from the CM.
+    commonKeyCertFile: ""
+  # below is the example:
+  #customCertificate:
+  #  customCertEnabled: true
+  #  commonCertAlias: "commonCert"
+  #  commonKeyCertFile: "commonDefKeyCert.txt"
+
+
+  # The custom directories/files can be mapped using the list format.
+  # For mapping, We need to provide full path of the file or directory.
+  # First we need to create the directory with 'ENG_RESOURCES' name if it is not available into PV.
+  # and keep the custom directories/files into created directory.
+  customFiles: []
+  # In the below example we need to keep aspera.conf, log4j2.xml, ncipher_gen2.cfg.jsse and lunasa_6_0.cfg.jsse files and
+  # Signon directory inside 'ENG_RESOURCES' directory.
+  # so that the container will copy these files into respective directory.
+  #customFiles:
+  #  - /bin/aspera.conf
+  #  - /conf/log4j2.xml
+  #  - /conf/lunasa_6_0.cfg.jsse
+  #  - /conf/ncipher_gen2.cfg.jsse
+  #  - /Signon
+
+
+  # Set network policy
+  # https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  networkPolicy:
+    # apply policy type
+    policyTypes:
+    - Ingress
+    - Egress
+
+    # apply ingress rule. Default allow all ingress traffic.
+    ingress:
+    - from: []
+      #- namespaceSelector:
+       #   matchLabels:
+        #    project: myproject
+      #- podSelector:
+       #   matchLabels:
+        #    role: frontend
+      #ports:
+      #- protocol: TCP
+       # port: 6379
+
+    # apply egress rule. Default allow all egress traffic
+    egress:
+    - to: []
+      #ports:
+      #- protocol: TCP
+       # port: 5978
+

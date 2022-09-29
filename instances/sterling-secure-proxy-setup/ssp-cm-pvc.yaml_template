@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "220"
+  name: ssp-cm-pvc
+  labels:
+    app.kubernetes.io/name: ibm-ssp-cm-pvc
+    app.kubernetes.io/instance: cm-release
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ibm-ssp-cm-1.2.3
+    release: cm-release
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: ${RWX_STORAGECLASS}
