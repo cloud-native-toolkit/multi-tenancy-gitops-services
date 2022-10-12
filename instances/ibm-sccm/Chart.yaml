@@ -8,6 +8,5 @@ dependencies:
     version: 0.5.0
     repository: https://charts.cloudnativetoolkit.dev
   - name: ibm-sccm
-    version: 1.0.8
-    repository: https://raw.githubusercontent.com/IBM/charts/master/repo/ibm-helm
-
+    version: 1.0.12
+    repository: https://jsaez-ibm.github.io/gitops-testing
