@@ -1,0 +1,10 @@
+apiVersion: console.openshift.io/v1
+kind: ConsoleLink
+metadata:
+  name: decision-runner
+spec:
+  href: https://cpd-cp4a.itzroks-2700042qpp-y4r2pl-4b4a324f027aea19c5cbc0c3275c4656-0000.us-east.containers.appdomain.cloud/odm/DecisionRunner
+  location: ApplicationMenu
+  applicationMenu:
+    section: Operational Decision Manager
+  text: Decision Runner

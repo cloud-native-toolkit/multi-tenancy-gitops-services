@@ -1,0 +1,6 @@
+resources:
+- setup-script.yaml
+- setup-job.yaml
+- setup-role.yaml
+- setup-rolebinding.yaml
+- setup-sa.yaml

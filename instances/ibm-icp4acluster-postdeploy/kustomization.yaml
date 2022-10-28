@@ -1,0 +1,7 @@
+resources:
+
+- post-deploy/cloud-pak-dashboard.yaml
+- post-deploy/decision-center.yaml
+- post-deploy/decision-runner.yaml
+- post-deploy/decision-server-console.yaml
+- post-deploy/decision-server-runtime.yaml

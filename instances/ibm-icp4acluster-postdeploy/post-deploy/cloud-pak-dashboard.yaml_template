@@ -1,0 +1,10 @@
+apiVersion: console.openshift.io/v1
+kind: ConsoleLink
+metadata:
+  name: cloud-pak-dashboard
+spec:
+  href: https://cpd-$NAMESPACE.$INGRESS_DOMAIN
+  location: ApplicationMenu
+  applicationMenu:
+    section: IBM Cloud Paks
+  text: Cloud Pak Dashboard

@@ -1,0 +1,10 @@
+apiVersion: console.openshift.io/v1
+kind: ConsoleLink
+metadata:
+  name: decision-center
+spec:
+  href: https://cpd-$NAMESPACE.$INGRESS_DOMAIN/odm/decisioncenter
+  location: ApplicationMenu
+  applicationMenu:
+    section: Operational Decision Manager
+  text: Decision Center
