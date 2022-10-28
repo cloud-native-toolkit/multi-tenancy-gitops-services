@@ -188,7 +188,7 @@ spec:
       ## The possible values are "db2" / "postgres" / "sqlserver".
       dc_database_type: "db2"
       ## Provide the database server name or IP address of the database server.
-      database_servername: "c-cp4a-db2-instance-db2u.db2.svc.cluster.local"
+      database_servername: "c-db2ucluster-cp4ba-db2u.db2.svc.cluster.local"
       ## Provide the database server port.  For Db2, the default is "50000".  For Oracle, the default is "1521"
       dc_common_database_port: "50000"
       ## Provide the name of the database for ODM.  For example: "ODMDB"
