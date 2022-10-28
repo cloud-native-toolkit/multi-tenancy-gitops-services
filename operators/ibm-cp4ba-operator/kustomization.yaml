@@ -1,0 +1,3 @@
+resources:
+- deployment/cp4ba-catalogsource.yaml
+- deployment/cp4ba-subscription.yaml

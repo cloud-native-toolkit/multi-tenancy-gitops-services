@@ -14,7 +14,6 @@ data:
     ## wait until the LDAP server is ready
 
     cat <<EOF >ldapuser.txt
-    /opt/ibm/ldap_scripts/addLdapUser.py -u icnadm -p Passw0rd -r user
     /opt/ibm/ldap_scripts/addLdapUser.py -u odmadm -p Passw0rd -r user
     EOF
 
@@ -24,10 +23,6 @@ data:
     ## wait until the DB2 server is ready
     cat <<EOF >db2cfg.txt
     su - db2inst1
-    db2 create database icndb automatic storage yes using codeset UTF-8 territory US pagesize 32768;
-    db2 connect to icndb;
-    db2 grant dbadm on database to user icnadm;
-    db2 connect reset;
     db2 create database odmdb automatic storage yes using codeset UTF-8 territory US pagesize 32768;
     db2 connect to odmdb;
     db2 CREATE BUFFERPOOL BP32K SIZE 2000 PAGESIZE 32K;

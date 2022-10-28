@@ -14,7 +14,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "250"
   name: icp4adeploy
-  namespace: cp4a
+  namespace: cp4ba
   labels:
     app.kubernetes.io/instance: ibm-dba
     app.kubernetes.io/managed-by: ibm-dba
@@ -204,6 +204,8 @@ spec:
       ########################################################################
     #  odm_configuration:
   odm_configuration:
+    # decisionConsole: confirm there is a spec for the console?
+    #   enabled: true 
     decisionCenter:
       enabled: true
     decisionServerRuntime:
