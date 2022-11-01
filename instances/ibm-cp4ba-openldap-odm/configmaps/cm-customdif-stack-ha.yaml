@@ -1,0 +1,103 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: openldap-openldap-stack-ha-customldif
+  namespace: openldap
+  annotations:
+    argocd.argoproj.io/sync-wave: "210"
+data:
+  01-default-users.ldif: |-
+    # Units
+    dn: ou=Users,dc=cp
+    objectClass: organizationalUnit
+    ou: Users
+
+    dn: ou=Groups,dc=cp
+    objectClass: organizationalUnit
+    ou: Groups
+
+    # Users
+    dn: uid=cpadmin,ou=Users,dc=cp
+    objectClass: inetOrgPerson
+    objectClass: top
+    cn: cpadmin
+    sn: cpadmin
+    uid: cpadmin
+    mail: cpadmin@cp.local
+    userpassword:: UGFzc3cwcmQ=
+    employeeType: admin
+
+    dn: uid=cpadmin1,ou=Users,dc=cp
+    objectClass: inetOrgPerson
+    objectClass: top
+    cn: cpadmin1
+    sn: cpadmin1
+    uid: cpadmin1
+    mail: cpadmin1@cp.local
+    userpassword:: UGFzc3cwcmQ=
+    employeeType: admin
+
+    dn: uid=cpadmin2,ou=Users,dc=cp
+    objectClass: inetOrgPerson
+    objectClass: top
+    cn: cpadmin2
+    sn: cpadmin2
+    uid: cpadmin2
+    mail: cpadmin2@cp.local
+    userpassword:: UGFzc3cwcmQ=
+    employeeType: admin
+
+    dn: uid=cpuser,ou=Users,dc=cp
+    objectClass: inetOrgPerson
+    objectClass: top
+    cn: cpuser
+    sn: cpuser
+    uid: cpuser
+    mail: cpuser@cp.local
+    userpassword:: UGFzc3cwcmQ=
+
+    dn: uid=cpuser1,ou=Users,dc=cp
+    objectClass: inetOrgPerson
+    objectClass: top
+    cn: cpuser1
+    sn: cpuser1
+    uid: cpuser1
+    mail: cpuser1@cp.local
+    userpassword:: UGFzc3cwcmQ=
+
+    dn: uid=cpuser2,ou=Users,dc=cp
+    objectClass: inetOrgPerson
+    objectClass: top
+    cn: cpuser2
+    sn: cpuser2
+    uid: cpuser2
+    mail: cpuser2@cp.local
+    userpassword:: UGFzc3cwcmQ=
+
+    # Groups
+    dn: cn=cpadmins,ou=Groups,dc=cp
+    objectClass: groupOfNames
+    objectClass: top
+    cn: cpadmins
+    member: uid=cpadmin,ou=Users,dc=cp
+    member: uid=cpadmin1,ou=Users,dc=cp
+    member: uid=cpadmin2,ou=Users,dc=cp
+
+    dn: cn=cpusers,ou=Groups,dc=cp
+    objectClass: groupOfNames
+    objectClass: top
+    cn: cpusers
+    member: uid=cpadmin,ou=Users,dc=cp
+    member: uid=cpadmin1,ou=Users,dc=cp
+    member: uid=cpadmin2,ou=Users,dc=cp
+    member: uid=cpuser,ou=Users,dc=cp
+    member: uid=cpuser1,ou=Users,dc=cp
+    member: uid=cpuser2,ou=Users,dc=cp
+
+    dn: cn=cpusers1,ou=Groups,dc=cp
+    objectClass: groupOfNames
+    objectClass: top
+    cn: cpusers1
+    member: uid=cpuser,ou=Users,dc=cp
+    member: uid=cpuser1,ou=Users,dc=cp
+    member: uid=cpuser2,ou=Users,dc=cp

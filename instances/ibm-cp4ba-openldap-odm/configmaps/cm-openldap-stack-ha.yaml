@@ -1,0 +1,30 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: openldap-openldap-stack-ha-env
+  namespace: openldap
+  annotations:
+    argocd.argoproj.io/sync-wave: "210"
+data:
+  LDAP_REMOVE_CONFIG_AFTER_SETUP: 'true'
+  LDAP_TLS_CIPHER_SUITE: NORMAL
+  LDAP_TLS: 'true'
+  LDAP_TLS_KEY_FILENAME: tls.key
+  LDAP_READONLY_USER_USERNAME: readonly
+  LDAP_TLS_CA_CRT_FILENAME: ca.crt
+  LDAP_TLS_REQCERT: never
+  LDAP_TLS_ENFORCE: 'false'
+  LDAP_TLS_PROTOCOL_MIN: '3.0'
+  LDAP_READONLY_USER_PASSWORD: readonly
+  CONTAINER_LOG_LEVEL: '4'
+  LDAP_READONLY_USER: 'false'
+  LDAP_LOG_LEVEL: '256'
+  LDAP_ORGANISATION: CP
+  LDAP_RFC2307BIS_SCHEMA: 'false'
+  LDAP_TLS_VERIFY_CLIENT: never
+  LDAP_SSL_HELPER_PREFIX: ldap
+  LDAP_TLS_DH_PARAM_FILENAME: dhparam.pem
+  LDAP_DOMAIN: cp
+  LDAP_BACKEND: mdb
+  KEEP_EXISTING_CONFIG: 'false'
+  LDAP_TLS_CRT_FILENAME: tls.crt

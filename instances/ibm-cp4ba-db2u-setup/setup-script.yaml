@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: odm-db2u-setup
+data:
+  setup.sh: |
+    #!/bin/bash
+      set -x
+      sleep 600
+      curl -o /tmp/client.tgz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.38/openshift-client-linux.tar.gz
+      cd /tmp
+      tar -xzf client.tgz
+      export PATH=$PATH:/tmp
+      oc project db2
+    ## wait until the LDAP server is ready
+
+    cat <<EOF >ldapuser.txt
+    /opt/ibm/ldap_scripts/addLdapUser.py -u odmadm -p Passw0rd -r user
+    EOF
+
+      ldap_pod=$(oc get pods -l role=ldap -o name)
+      oc rsh ${ldap_pod} /bin/bash < ldapuser.txt
+
+    ## wait until the DB2 server is ready
+    cat <<EOF >db2cfg.txt
+    su - db2inst1
+    db2 create database odmdb automatic storage yes using codeset UTF-8 territory US pagesize 32768;
+    db2 connect to odmdb;
+    db2 CREATE BUFFERPOOL BP32K SIZE 2000 PAGESIZE 32K;
+    db2 CREATE TABLESPACE RESDWTS PAGESIZE 32K BUFFERPOOL BP32K;
+    db2 CREATE SYSTEM TEMPORARY TABLESPACE RESDWTMPTS PAGESIZE 32K BUFFERPOOL BP32K;
+    db2 grant dbadm on database to user odmadm;
+    db2 connect reset;
+    EOF
+
+      oc rsh c-db2ucluster-cp4ba-db2u-0 /bin/bash < db2cfg.txt
+    exit 0

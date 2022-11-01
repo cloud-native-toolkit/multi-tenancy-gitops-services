@@ -1,0 +1,11 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: openldap-phpldapadmin
+  namespace: openldap
+  annotations:
+    argocd.argoproj.io/sync-wave: "210"
+data:
+  PHPLDAPADMIN_HTTPS: 'false'
+  PHPLDAPADMIN_LDAP_HOSTS: openldap-openldap-stack-ha.openldap.svc.cluster.local
+  PHPLDAPADMIN_TRUST_PROXY_SSL: 'true'

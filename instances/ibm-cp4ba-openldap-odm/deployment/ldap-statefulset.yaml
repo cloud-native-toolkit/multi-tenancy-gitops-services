@@ -1,0 +1,126 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: openldap-openldap-stack-ha
+  namespace: openldap
+  annotations:
+    argocd.argoproj.io/sync-wave: "230"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openldap-openldap-stack-ha
+      release: openldap
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: openldap-openldap-stack-ha
+        release: openldap
+      annotations:
+        checksum/configmap-customldif: 6d4a76c2e79afd00020ca7eedaefb60a0ddf560b66ac3d08b4838dd94dd6b178
+        checksum/configmap-env: c47d8391c4f489a594096a2041c1a23677f2f76783b8294c2c291a44f74eaaef
+    spec:
+      volumes:
+        - name: custom-ldif-files
+          configMap:
+            name: openldap-openldap-stack-ha-customldif
+            defaultMode: 420
+      containers:
+        - resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          readinessProbe:
+            tcpSocket:
+              port: ldap-port
+            initialDelaySeconds: 60
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          terminationMessagePath: /dev/termination-log
+          name: openldap-stack-ha
+          livenessProbe:
+            tcpSocket:
+              port: ldap-port
+            initialDelaySeconds: 60
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          ports:
+            - name: ldap-port
+              containerPort: 389
+              protocol: TCP
+            - name: ssl-ldap-port
+              containerPort: 636
+              protocol: TCP
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/ldap
+              subPath: data
+            - name: data
+              mountPath: /etc/ldap/slapd.d
+              subPath: config-data
+            - name: data
+              mountPath: /container/service/slapd/assets/certs
+            - name: custom-ldif-files
+              mountPath: /container/service/slapd/assets/config/bootstrap/ldif/custom
+          terminationMessagePolicy: File
+          envFrom:
+            - configMapRef:
+                name: openldap-openldap-stack-ha-env
+            - secretRef:
+                name: openldap-openldap-stack-ha
+          image: 'osixia/openldap:1.5.0'
+          args:
+            - '-l'
+            - info
+            - '--copy-service'
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: openldap-openldap-stack-ha
+                  release: openldap
+              topologyKey: kubernetes.io/hostname
+      schedulerName: default-scheduler
+  volumeClaimTemplates:
+    - kind: PersistentVolumeClaim
+      apiVersion: v1
+      metadata:
+        name: data
+        creationTimestamp: null
+      spec:
+        accessModes:
+          - ReadWriteMany
+        resources:
+          requests:
+            storage: 8Gi
+        # volumeMode: Filesystem
+        storageClassName: ibmc-file-gold #if your using roks
+      status:
+        phase: Pending
+  serviceName: openldap-openldap-stack-ha-headless
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  revisionHistoryLimit: 10
