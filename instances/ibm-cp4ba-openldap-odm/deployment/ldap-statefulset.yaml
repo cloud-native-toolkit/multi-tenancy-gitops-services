@@ -114,7 +114,7 @@ spec:
           requests:
             storage: 8Gi
         # volumeMode: Filesystem
-        storageClassName: ibmc-file-gold #if your using roks
+        storageClassName: managed-nfs-storage #if your using roks
       status:
         phase: Pending
   serviceName: openldap-openldap-stack-ha-headless
