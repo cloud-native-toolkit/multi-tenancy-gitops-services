@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: odm-postdeploy-job
+spec:
+  selector: {}
+  template:
+    metadata:
+      name: setup
+    spec:
+      serviceAccount: odm-postdeploy-sa
+      containers:
+        - name: setup
+          image: registry.access.redhat.com/ubi8/ubi:8.6-983
+          command:
+            - /bin/bash
+            - /apps/setup.sh
+          volumeMounts:
+            - name: setupjob
+              mountPath: /apps
+      restartPolicy: Never
+      volumes:
+      - name: setupjob
+        configMap:
+          name: odm-postdeploy-cm
