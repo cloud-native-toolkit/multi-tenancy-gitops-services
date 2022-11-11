@@ -96,10 +96,10 @@ spec:
     ## and fast storage parameters below.  If you only have 1 storage class defined, then you can use that 1 storage class for all 3 parameters.
     ## sc_block_storage_classname is for Zen, Zen requires/recommends block storage (RWO) for metastoreDB
     storage_configuration:
-      sc_slow_file_storage_classname: ibmc-file-gold-gid
-      sc_medium_file_storage_classname: ibmc-file-gold-gid
-      sc_fast_file_storage_classname: ibmc-file-gold-gid
-      sc_block_storage_classname: ibmc-block-gold
+      sc_slow_file_storage_classname: managed-nfs-storage
+      sc_medium_file_storage_classname: managed-nfs-storage
+      sc_fast_file_storage_classname: managed-nfs-storage
+      sc_block_storage_classname: managed-nfs-storage
     sc_cpe_limited_storage: false
     image_pull_secrets:
     - ibm-entitlement-key

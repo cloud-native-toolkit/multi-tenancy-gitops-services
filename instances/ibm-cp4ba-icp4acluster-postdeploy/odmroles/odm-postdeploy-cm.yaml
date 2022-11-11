@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: odm-postdeploy-cm
+data:
+  setup.sh: |
+    #!/bin/bash
+    set -x
+    curl -o /tmp/client.tgz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.10.38/openshift-client-linux.tar.gz
+    cd /tmp
+    tar -xzf client.tgz
+    export PATH=$PATH:/tmp
+
+    # wait till zen is available 
+    ZENIAM=$(oc get icp4acluster icp4adeploy -n cp4ba -o jsonpath='{.status.components.prereq.iamIntegrationStatus}')
+    while [ "$ZENIAM" != "Ready" ]; 
+      do
+        sleep 10
+        ZENIAM=$(oc get icp4acluster icp4adeploy -n cp4ba -o jsonpath='{.status.components.prereq.iamIntegrationStatus}')
+      done
+    sleep 60
+    
+    CPD_HOST_NAME=$(oc get route -n cp4ba cpd -o jsonpath="{.spec.host}" 2>/dev/null)
+    BASE_URL="https://${CPD_HOST_NAME}"
+    ZEN_PASSWORD=$(oc get secret admin-user-details --namespace cp4ba -o jsonpath='{.data.initial_admin_password}' \
+        | base64 --decode)
+    BEARER_TOKEN=$(curl -s -k "${BASE_URL}/icp4d-api/v1/authorize" \
+      -H "Content-Type: application/json" \
+      --request POST \
+      --data "{\"username\":\"admin\",\"password\":\"$ZEN_PASSWORD\"}" | \
+      sed -e 's/[{}]/''/g' | awk -v RS=',' -F: '/^\"token\"/ {print $2}' | cut -d\" -f2 \
+    )
+
+    # cpadmin uid
+    cpadmin_uid=$(curl -s -k "${BASE_URL}/usermgmt/v1/user/cpadmin" \
+          -H 'Accept: application/json' -H 'Content-Type: application/json' \
+          -H "Authorization: Bearer ${BEARER_TOKEN}" | \
+          sed -e 's/[{}]/''/g' | awk -v RS=',' -F: '/^\"uid\"/ {print $2}' | cut -d\" -f2)
+
+    # create group cpadmins in Zen
+    groupCreationResponse=$(curl -s -k "${BASE_URL}/usermgmt/v2/groups" \
+        -H 'Accept: application/json' \
+        -H 'Content-Type: application/json' \
+        -H "Authorization: Bearer ${BEARER_TOKEN}" \
+        --request POST \
+        --data "{\"description\":\"CloudPak Admins\",\"name\":\"cpadmins\", \"role_identifiers\": [\"zen_administrator_role\",\"zen_user_role\",\"iaf-automation-admin\",\"iaf-automation-analyst\",\"iaf-automation-developer\",\"iaf-automation-operator\",\"odm_admin_role\",\"odm_runtime_admin_role\",\"odm_runtime_user_role\",\"odm_business_user_role\",\"odm_business_admin_role\"]}" \
+      )
+
+    GROUP_ID=$(echo $groupCreationResponse | \
+      sed -e 's/[{}]/''/g' | awk -v RS=',' -F: '/^\"group_id\"/ {print $2}'
+    )
+
+    # add LDAP group cpadmins to Zen group cpadmins
+    curl -s -k "${BASE_URL}/usermgmt/v2/groups/${GROUP_ID}/members" \
+        -H 'Accept: application/json' -H 'Content-Type: application/json' \
+        -H "Authorization: Bearer ${BEARER_TOKEN}" \
+        --request POST \
+        --data "{\"ldap_groups\":[\"cpadmins\"],\"user_identifiers\":[$cpadmin_uid]}"
+
+    exit
