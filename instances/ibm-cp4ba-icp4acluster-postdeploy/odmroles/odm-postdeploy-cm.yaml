@@ -18,7 +18,8 @@ data:
         sleep 10
         ZENIAM=$(oc get icp4acluster icp4adeploy -n cp4ba -o jsonpath='{.status.components.prereq.iamIntegrationStatus}')
       done
-
+    sleep 60
+    
     CPD_HOST_NAME=$(oc get route -n cp4ba cpd -o jsonpath="{.spec.host}" 2>/dev/null)
     BASE_URL="https://${CPD_HOST_NAME}"
     ZEN_PASSWORD=$(oc get secret admin-user-details --namespace cp4ba -o jsonpath='{.data.initial_admin_password}' \
