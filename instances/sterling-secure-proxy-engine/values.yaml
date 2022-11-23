@@ -10,7 +10,6 @@ ibm-ssp-engine:
   # Non-production respectively. Remember that this parameter is crucial for IBM Licensing and Metering Service
   licenseType: non-prod
 
-  # Specify the respective Docker Image details for IBMCCS
   image:
     # Specify the repository name along with image name
     repository: "cp.icr.io/cp/ibm-ssp-engine/ssp-engine-docker-image"
