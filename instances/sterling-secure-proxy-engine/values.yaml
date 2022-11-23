@@ -288,7 +288,4 @@ ibm-ssp-engine:
     # apply egress rule. Default allow all egress traffic
     egress:
     - to: []
-      #ports:
-      #- protocol: TCP
-       # port: 5978
-
+ 
