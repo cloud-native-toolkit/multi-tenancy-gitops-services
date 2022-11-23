@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: keycert-hook-sync
+  namespace: ssp
+  annotations:
+    argocd.argoproj.io/sync-wave: "286"
+spec:
+  template:
+    spec:
+      serviceAccountName: ssp-argocd-hook-job
+      containers:
+      - name: keycert-sync
+        image: quay.io/openshift/origin-cli:latest
+        command: ["bash"]
+        args:
+          - -c
+          - "oc wait -n ssp pod ibm-ssp-cm-ibm-ssp-cm-0 --for=condition=Ready --timeout=660s;oc rsync ibm-ssp-cm-ibm-ssp-cm-0:defkeyCert.txt /tmp/;sleep 5;oc create secret generic -n ssp engine-key-cert --from-file=keyCert=./tmp/defkeyCert.txt --dry-run=client -o yaml | oc apply -f -"
+      restartPolicy: OnFailure
+  backoffLimit: 25

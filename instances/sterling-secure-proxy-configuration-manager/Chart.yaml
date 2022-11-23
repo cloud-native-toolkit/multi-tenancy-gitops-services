@@ -1,0 +1,13 @@
+apiVersion: v2
+appVersion: 1.0.0
+dependencies:
+- alias: sch
+  name: ibm-sch
+  repository: https://charts.cloudnativetoolkit.dev
+  version: ^1.2.18
+- name: ibm-ssp-cm
+  repository: https://raw.githubusercontent.com/IBM/charts/master/repo/ibm-helm
+  version: 1.2.3
+name: ssp-cm-gitops
+type: application
+version: 1.0.0
