@@ -1,0 +1,3 @@
+resources:
+- deployment/rolebinding-scc-anyuid.yaml
+- deployment/baw-cr.yaml
