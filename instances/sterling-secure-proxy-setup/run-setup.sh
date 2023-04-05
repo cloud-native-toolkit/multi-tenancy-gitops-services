@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-NS="ssp"
 # Set variables
 if [[ -z ${CM_SYS_PASS} ]]; then
   echo "Please provide environment variable CM_SYS_PASS"
@@ -50,8 +49,15 @@ if [[ -z ${RWX_STORAGECLASS}  ]]; then
   exit 1
 fi
 
+if [[ -z ${NS} ]]; then
+  echo "Please provide environment variable NS"
+  exit 1
+fi
+
+oc project "${NS}"
+
 SEALED_SECRET_NAMESPACE=${SEALED_SECRET_NAMESPACE:-sealed-secrets}
-SEALED_SECRET_CONTROLLER_NAME=${SEALED_SECRET_CONTOLLER_NAME:-sealed-secrets}
+SEALED_SECRET_CONTROLLER_NAME=${SEALED_SECRET_CONTROLLER_NAME:-sealed-secrets}
 
 ### Configuration Manager
 printf "Creating Configuration Manager Secret \n"
@@ -63,10 +69,10 @@ oc create secret generic ibm-ssp-cm-secret --type=Opaque \
 --from-literal=keyCertStorePassphrase="${CM_CERTSTORE_PASSWORD}" \
 --from-literal=keyCertEncryptPassphrase="${CM_CERTENCRYPT_PASSWORD}" \
 --from-literal=customKeyCertPassphrase="${CM_CUSTOMCERT_PASSWORD}" \
---dry-run=client -o yaml > delete-ssp-cm-secret.yaml
+--dry-run=none -o yaml > delete-ssp-cm-secret.yaml
 
 # Encrypt the secret using kubeseal and private key from the cluster
-kubeseal -n ${NS} --controller-name="${SEALED_SECRET_CONTROLLER_NAME}" --controller-namespace="${SEALED_SECRET_NAMESPACE}" -o yaml < delete-ssp-cm-secret.yaml
+kubeseal -n "${NS}" --controller-name="${SEALED_SECRET_CONTROLLER_NAME}" --controller-namespace="${SEALED_SECRET_NAMESPACE}" -o yaml < delete-ssp-cm-secret.yaml
 
 # NOTE, do not check delete-ssp-cm-secret.yaml into git!
 rm delete-ssp-cm-secret.yaml
@@ -79,10 +85,10 @@ oc create secret generic ibm-ssp-engine-secret --type=Opaque \
 --from-literal=keyCertStorePassphrase="${ENGINE_CERTSTORE_PASSWORD}" \
 --from-literal=keyCertEncryptPassphrase="${ENGINE_CERTENCRYPT_PASSWORD}" \
 --from-literal=customKeyCertPassphrase="${ENGINE_CUSTOMCERT_PASSWORD}" \
---dry-run=client -o yaml > delete-ibm-ssp-engine-secret.yaml
+--dry-run=none -o yaml > delete-ibm-ssp-engine-secret.yaml
 
 # Encrypt the secret using kubeseal and private key from the cluster
-kubeseal -n ${NS} --controller-name="${SEALED_SECRET_CONTROLLER_NAME}" --controller-namespace="${SEALED_SECRET_NAMESPACE}" -o yaml < delete-ibm-ssp-engine-secret.yaml
+kubeseal -n "${NS}" --controller-name="${SEALED_SECRET_CONTROLLER_NAME}" --controller-namespace="${SEALED_SECRET_NAMESPACE}" -o yaml < delete-ibm-ssp-engine-secret.yaml
 
 # NOTE, do not check delete-ibm-ssp-engine-secret.yaml into git!
 rm delete-ibm-ssp-engine-secret.yaml
@@ -98,3 +104,6 @@ sh > ssp-cm-pvc.yaml
 
 ( echo "cat <<EOF" ; cat ssp-engine-pvc.yaml_template ;) | \
 sh > ssp-engine-pvc.yaml
+
+oc apply -f ssp-cm-pvc.yaml
+oc apply -f ssp-engine-pvc.yaml

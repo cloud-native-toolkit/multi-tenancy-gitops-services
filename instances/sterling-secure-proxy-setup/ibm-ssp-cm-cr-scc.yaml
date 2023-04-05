@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "225"
+  name: "ibm-ssp-cm-scc"
+  labels:
+    app.kubernetes.io/name: ibm-ssp-cm-scc
+    app.kubernetes.io/instance: ibm-ssp-cm-scc
+    app.kubernetes.io/managed-by: IBM
+rules:
+- apiGroups:
+  - security.openshift.io
+  resourceNames:
+  - ibm-ssp-cm-scc
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - use
