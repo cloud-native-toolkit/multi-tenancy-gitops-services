@@ -1,0 +1,36 @@
+# The `spec.containers[0].args` contains the command run on the pod
+# The `/data` directory corresponds to the `spec.containers[0].volumeMounts[0].mountPath`
+# That mount path corresponds to a Kubernetes HostPath which binds `/data` to a local drive or volume on the worker node where the pod runs
+
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "250"
+  labels:
+    app: minio
+  name: minio-dev
+  namespace: minio-dev # Change this value to match the namespace metadata.name
+spec:
+  containers:
+  - name: minio
+    image: quay.io/minio/minio:latest
+    command:
+    - /bin/bash
+    - -c
+    args:
+    - minio server /data --console-address :9090
+    # volumeMounts:
+    #- mountPath: /data
+    # name: localvolume # Corresponds to the `spec.volumes` Persistent Volume
+
+    volumeMounts:
+    - mountPath: /var/nfs-data/resources
+      name: volume
+      #nodeSelector:
+      #kubernetes.io/hostname: kubealpha.local # Specify a node label associated to the Worker Node on which you want to deploy the pod.
+
+  volumes:
+  - name: volume
+    persistentVolumeClaim:
+      claimName: minio-dev-resources
