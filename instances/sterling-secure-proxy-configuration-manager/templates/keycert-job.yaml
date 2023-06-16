@@ -1,0 +1,54 @@
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: keycert-handoff-job
+  namespace: {{ .Values.namespace | quote }}
+  labels:
+    job-name: keycert-handoff-job
+  annotations:
+    "helm.sh/hook": post-install
+spec:
+  template:
+    metadata:
+      name: keycert-handoff
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - ibm-ssp-cm
+            topologyKey: kubernetes.io/hostname
+      serviceAccountName: "{{ .Release.Name }}-ibm-ssp-cm-serviceaccount"
+      initContainers:
+        - name: wait-for-cm
+          image: alpine/k8s:1.24.13
+          env:
+          - name: POD_NAME
+            value: "{{ .Release.Name }}-ibm-ssp-cm-0"
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - "kubectl wait --for=condition=Ready pod/$(POD_NAME) --timeout=1200s"
+          imagePullPolicy: Always
+      containers:
+        - name: keycert-handoff
+          image: alpine/k8s:1.24.13
+          command:
+            - "/bin/sh"
+          args:
+            - "-c"
+            - "kubectl create secret generic engine-key-cert --from-file=keyCert=/apps/CM/defkeyCert.txt"
+          volumeMounts:
+            - mountPath: /apps
+              name: pvc-mount
+      restartPolicy: Never
+      volumes:
+      - name: pvc-mount
+        persistentVolumeClaim:
+          claimName: {{ index .Values "ibm-ssp-cm" "persistentVolume" "existingClaimName" | quote }}
+
