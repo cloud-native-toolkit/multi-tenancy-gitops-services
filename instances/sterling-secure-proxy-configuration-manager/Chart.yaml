@@ -4,8 +4,10 @@ dependencies:
 - alias: sch
   name: ibm-sch
   version: ^1.2.18
+  repository: https://charts.cloudnativetoolkit.dev
 - name: ibm-ssp-cm
   version: 1.2.8
+  repository: https://raw.githubusercontent.com/IBM/charts/master/repo/ibm-helm
 name: ibm-ssp-config-manager
 type: application
 version: 1.0.0
