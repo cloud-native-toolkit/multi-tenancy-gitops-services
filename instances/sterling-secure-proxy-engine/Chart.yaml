@@ -3,11 +3,11 @@ appVersion: 1.0.0
 dependencies:
 - alias: sch
   name: ibm-sch
-  repository: https://charts.cloudnativetoolkit.dev
   version: ^1.2.18
+  repository: https://charts.cloudnativetoolkit.dev
 - name: ibm-ssp-engine
+  version: 1.2.8
   repository: https://raw.githubusercontent.com/IBM/charts/master/repo/ibm-helm
-  version: 1.2.3
-name: ssp-engine-gitops
+name: ibm-ssp-engine-umbrella
 type: application
 version: 1.0.0

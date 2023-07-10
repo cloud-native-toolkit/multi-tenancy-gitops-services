@@ -1,113 +1,127 @@
+namespace: "ssp"
+
 ibm-ssp-cm:
-# Default values for IBM® Sterling Secure Proxy - Configuration Manager for Linux Helm Chart a.k.a IBM Certified Container Software (IBMCCS).
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates. To override the default values either change in this file or use
-# --set option provided by helm cli.
-# Change license to true to indicate that you have read and agree to license agreements
-# Refer: http://www-03.ibm.com/software/sla/sladb.nsf (L/N: L-KNAN-C6EJKA)
+  # Default values for IBM® Sterling Secure Proxy - Configuration Manager for Linux Helm Chart a.k.a IBM Certified Container Software (IBMCCS).
+  # This is a YAML-formatted file.
+  # Declare variables to be passed into your templates. To override the default values either change in this file or use
+  # --set option provided by helm cli.
+
+  # Change license to true to indicate that you have read and agree to license agreements
+  # Refer: http://www-03.ibm.com/software/sla/sladb.nsf (L/N: L-KNAN-C6EJKA)
   license: true
 
-  # Specify the license edition as per license agreement. Valid value is prod or non-prod for Production and
+  # Specify the license edition as per license agreement. Valid value is prod or non-prod for Production and 
   # Non-production respectively. Remember that this parameter is crucial for IBM Licensing and Metering Service
   licenseType: non-prod
 
   # This name will be appended to release name to form the name of the resources created by this chart
+  nameOverride: ""
+  # Currently, the only supported architecture for IBMCCS is `amd64`
+  arch: "amd64"
 
   # Specify the respective Docker Image details for IBMCCS
   image:
     # Specify the repository name along with image name
     repository: "cp.icr.io/cp/ibm-ssp-cm/ssp-cm-docker-image"
-    # Specify the tag name for the image
-    tag: "6.0.3.0.02"
-    # Specify the image pull secret for the service, if the image is in private registry
-    imageSecrets: "ssp-imageregistrysecret"
+    # Specify the tag name for the image  
+    tag: "6.0.3.0.07"
+    # Specify the image pull secret for the service, if the image is in private registry 
+    imageSecrets: ""
     # Enable true/false to use image digest
     digest:
-      enabled: false
-      value: sha256:3600a0f1138a77ad42cecd4f986b37c0d77d63858c4a8c2c63a5ad61a9957bd6
-    # Specify respective pull policy to used to override default `IfNotPresent` policy
+      enabled: true
+      value: sha256:d75532543fc07808c8189c221c2e60cf5bffa0977100f52f7f7a6a0229700bd4
+    # Specify respective pull policy to used to override default `IfNotPresent` policy  
     pullPolicy: IfNotPresent
-  # Currently, the only supported architecture for IBMCCS is `amd64`
-  arch: "amd64"
+
+
   # Specify these fields to provide config values for CM application
   cmArgs:
-     # Set the value "true" to Generate Key Certificate, if you are installing Secure Proxy CM first.
-     # Set the value "false" to Import Key Cert Exported from Secure Proxy Engine if you have installed Secure Proxy Engine first.
+    # Set the value "true" to Generate Key Certificate, if you are installing Secure Proxy CM first.
+    # Set the value "false" to Import Key Cert Exported from Secure Proxy Engine if you have installed Secure Proxy Engine first.
     keyCertExport: true
-    # Set the certificate alias value.
+    # Set the certificate alias value. 
     keyCertAliasName: "keycert"
-    # JVM max heap size - don't set more than container limit resource memory.
+    # JVM max heap size - don't set more than container limit resource memory. 
     maxHeapSize: "2048m"
-
+    # Enable/Disable host name verification
+    # Set to false, will bypass the host header check. 
+    hostNameVerification: false
+    # Following property is mandatory if you are enabling host name verification. 
+    # Specify comma delimited host names and IP addresses which can be used by users accessing CM thru browser.  
+    hostNames: ""
+    
 
   # persistence section specifies persistence volume claim settings which apply to the whole chart
   persistentVolume:
     # enabled is whether to use Persistent Volumes or not
     enabled: true
-    # useDynamicProvisioning is whether or not to use Storage Classes to dynamically create Persistent Volumes
+    # useDynamicProvisioning is whether or not to use Storage Classes to dynamically create Persistent Volumes 
     useDynamicProvisioning: false
     # Specify the existing PV claim name to be used for deployment
     existingClaimName: "ssp-cm-pvc"
     # Specify this to use selector label name for PV-PVC bind
-    labelName: "app.kubernetes.io/name"
+    labelName: ""
     # Specify this to use selector label value for PV-PVC bind
-    labelValue: "ibm-ssp-cm-pvc"
+    labelValue: ""
     # Specify this to set storage class name
-    storageClassName: "manual"
+    storageClassName: "ibmc-file-gold-gid"
     # Specify this to set PVC size
     size: 2Gi
     # Specify this to set access mode
-    accessMode: "ReadWriteOnce"
-
-  # Manage PV directory using Supplemental Group ID if needed.
+    accessMode: "ReadWriteOnce"    
+    
+  # Manage Storage permission 
   storageSecurity:
-    supplementalGroupId: ""
-
+    fsGroup: 65531
+    # Replace supplementalGroup Id with NFS User's groupId if the root squash is enabled on NFS server otherwise container will be failed
+    supplementalGroups: [65531]
+    
   # Specify these fields for Services
   service:
     # Specify this to set service type.
     type: "LoadBalancer"
     # Specify this to set load balancer IP. It's added for cloud environment.
-    loadBalancerIP: ""
+    loadBalancerIP: "" 
     # Specify this to set external IP to access application outside the cluster.
-    # externalIP: "141.125.97.203"
-    # Specify this to set annotations
+    externalIP: ""
+    # Specify this to set annotations 
     annotations: {}
       #service.kubernetes.io/ibm-load-balancer-cloud-provider-ip-type: public
       #service.kubernetes.io/ibm-load-balancer-cloud-provider-name: cm
       #service.kubernetes.io/ibm-load-balancer-cloud-provider-zone: main01
-
-    # Specify this to set external traffic policy
+      
+    # Specify this to set external traffic policy 
     externalTrafficPolicy: ""
     # Specify this to set session Affinity
     sessionAffinity: "ClientIP"
-    jetty:
-      # CM web application is accessed by using below mentioned service port, so add as per the requirement else it would be set 8443 as default port.
+    jetty: 
+      # CM web application is accessed by using below mentioned service port, so add as per the requirement else it would be set 8443 as default port. 
       servicePort: 8443
-      # If traditional jetty port is different from 8443 while migrating from traditional to container environment then in this case
-      # we need to change container port as traditional jetty port value else It is not required to change the container port value.
+      # If traditional jetty port is different from 8443 while migrating from traditional to container environment then in this case 
+      # we need to change container port as traditional jetty port value else It is not required to change the container port value.     
       containerPort: 8443
-    cm:
-      # CM is listen on the below mentioned service port, so add as per the requirement else it would be set 62366 as default port.
+    cm: 
+      # CM is listen on the below mentioned service port, so add as per the requirement else it would be set 62366 as default port. 
       servicePort: 62366
-      # If traditional CM listen port is different from 62366 while migrating from traditional to container environment then in this case
-      # we need to change container port as traditional CM listen port value else It is not required to change the container port value.
+      # If traditional CM listen port is different from 62366 while migrating from traditional to container environment then in this case 
+      # we need to change container port as traditional CM listen port value else It is not required to change the container port value.   
       containerPort: 62366
-
+    
 
   # Specify the Secret configuration for Configuration Manager
   secret:
     # Secret name for PassPhase and Password
     secretName: "ibm-ssp-cm-secret"
-    # Secret name for Key Certificate - Use only, if you are installing Configuration Manager after Engine otherwise it's not needed.
+    # Secret name for the imported Key Certificate from Engine - Use this if you are installing Configuration Manager after Engine otherwise it's not needed. 
     keyCertSecretName: ""
 
   # Specify the service account details
   serviceAccount:
-    # Set this field to `true` to create service account or `false` to use existing service account
-    create: false
+    # Set this field to `true` to create service account or `false` to use existing service account 
+    create: true
     # Specify the name of service account to be used
-    name: "ssp-cm-serviceaccount"
+    name: "" 
 
 
 
@@ -117,12 +131,12 @@ ibm-ssp-cm:
   ## Container Memory - limit and request both are set 2 GB as default value but we can modify as per the requirement.
   resources:
     limits:
-      cpu: 1000m
-      memory: 2Gi
+      cpu: 2000m
+      memory: 4Gi
       ephemeral-storage: "5Gi"
     requests:
-      cpu: 1000m
-      memory: 2Gi
+      cpu: 2000m
+      memory: 4Gi
       ephemeral-storage: "3Gi"
 
   affinity:
@@ -152,13 +166,13 @@ ibm-ssp-cm:
 
   # liveness and readiness Probe
   livenessProbe:
-    initialDelaySeconds: 200
+    initialDelaySeconds: 175
     timeoutSeconds: 30
     periodSeconds: 60
     failureThreshold: 10
 
   readinessProbe:
-    initialDelaySeconds: 190
+    initialDelaySeconds: 170
     timeoutSeconds: 5
     periodSeconds: 60
     failureThreshold: 10
@@ -166,17 +180,17 @@ ibm-ssp-cm:
   # Set this to true create route in OpenShift cluster
   route:
     enabled: true
-
+    
   # Set this to true to create Monitoring Dashboard for IBMCCS
   dashboard:
     enabled: false
-
+    
   # The following files can be customized using key value pair in the list format.
-  # conf/log4j.properties, bin/log.properties, bin/security.properties, bin/vendor.properties
+  # conf/log4j.properties, bin/log.properties, bin/security.properties, bin/vendor.properties 
   # Add/Update: Key and Value both must be provided in the below format.
   # <File Name Without Extension>_<Property Name>=<Property Value>
   customProperties: []
-  # below is the example:
+  # below is the example: 
   #customProperties:
   #  - log4j_log4j.logger.org.apache.commons.beanutils=OFF
   #  - log_audit.log.maxfilesize=10MB
@@ -185,41 +199,116 @@ ibm-ssp-cm:
   # Add/Update VM arguments in the list format
   # <Key as Java property name>=<value>
   vmArguments: []
-  # below is the example:
+  # below is the example: 
   #vmArguments:
   #  - Dssp.cm.jetty.sni.enable=false
   #  - DvalidateThruXSD=false
   #  - DsspcmDisableClientEndpointIdentification=true
 
 
-  # Use custom common certificate. It updates the engine, CM, and web server certificate.
-  # Exports the common certificate configuration into the PV mapped directory.
-  # Exported certificate(commonKeyCertFile) can be imported into the Engine.
-  # set the value "true" to update the custom certificate.
-  # set the value "false" to not update the custom certificate.
+  # Set custom certificate   
   customCertificate:
-    customCertEnabled: false
-    # set key store certificate file name
-    commonCertFile: ""
-    # set alias name
-    commonCertAlias: ""
-    # set export key certificate file name and it can be imported into the Engine.
-    commonKeyCertFile: ""
-  # below is the example:
-  #customCertificate:
-  #  customCertEnabled: true
-  #  commonCertFile: "commonKeyStore.p12"
-  #  commonCertAlias: "commonCert"
-  #  commonKeyCertFile: "commonDefKeyCert.txt"
+    # Common key-certificate for all components of SSP.
+    # The Engine, CM, web server, and servlet will use this key-certificate.
+    commonCert:
+      # Enable/Disable common cert
+      enabled: false
+      # Secret name of common certificate
+      secretName: ""
+      # Alias for common certificate
+      alias: ""
+      # Custom key cert file will be exported with below name under container and it will be imported into the Engine.
+      exportFileName: "exportCommonCert.txt"
+      
+    # Key-certificate for CM, web server, and servlet
+    cmCert:
+      # Enable/Disable CM cert
+      enabled: false
+      # Secret name of CM certificate
+      secretName: ""
+      # Alias for CM certificate
+      alias: ""
+    
+    # Key-certificate for CM server connection to servlet.   
+    cmServerCert:
+      # Enable/Disable CM Server cert
+      enabled: false
+      # Secret name of CM Server certificate
+      secretName: ""
+      # Alias for CM Server certificate
+      alias: ""
+      
+    # Key-certificate for Engine.
+    # Use this option when the Engine should use its own key-certificate.
+    engCert:    
+      # Enable/Disable engine cert
+      enabled: false
+      # Secret name of engine certificate
+      secretName: ""
+      # Alias for engine certificate
+      alias: ""
+      # Engine key cert file will be exported with below name under container and it will be imported into the Engine.
+      exportFileName: "exportEngineCert.txt"
+
+    # Key-certificate for CM client connection to Engine
+    cmClientCert:
+    # Enable/Disable CM Client cert
+      enabled: false
+      # Secret name of CM Client certificate
+      secretName: ""
+      # Alias for CM Client certificate
+      alias: ""
+      # CM Client key cert file will be exported with below name under container and it will be imported into the Engine.
+      exportFileName: "exportCMClientCert.txt"
+    
+    # Key-certificate for web server.  
+    webCert:
+    # Enable/Disable web cert
+      enabled: false
+      # Secret name of web certificate
+      secretName: ""
+      # Alias for web certificate
+      alias: ""
+      
+    # Enable client authentication on web server - Enabled priority is more than disabled.
+    clientAuth:
+      # Enable client Authentication 
+      enabled: false
+      # Disable client Authentication
+      disabled: false
+      # Secret Name of trusted certificate to add in web server trust store
+      trustedCertSecretName: ""
+      # Certificate alias for Jetty web server trusted certificate
+      certCAAlias: ""
+    
+    # Protocol and Cipher suites for CM 
+    cmSSL:
+      # Enable/Disable for update
+      enabled: false
+      # SSL/TLS protocol for CM.
+      protocol: "TLSv1.2"
+      # Cipher suites for CM and Separate cipher suites with semi colon.
+      ciphers: "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384;TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256;TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384;TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256;TLS_RSA_WITH_AES_256_GCM_SHA384;TLS_RSA_WITH_AES_128_GCM_SHA256"
+      # CM SSL changes key cert file will be exported with below name under container and it will be imported into the Engine.
+      exportFileName: "exportCMSSLCert.txt"
+    
+    # Protocol and Cipher suites for Jetty web server 
+    webSSL:
+      # Enable/Disable for update
+      enabled: false
+      # SSL/TLS protocol for web server.
+      protocol: "TLSv1.2"
+      # Cipher suites for web server and Separate cipher suites with semi colon.
+      ciphers: "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384;TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256;TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384;TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256;TLS_RSA_WITH_AES_256_GCM_SHA384;TLS_RSA_WITH_AES_128_GCM_SHA256"
 
 
   # The custom directories/files can be mapped using the list format.
-  # For mapping, We need to provide full path of the file or directory.
-  # First we need to create the directory with 'CM_RESOURCES' name if it is not available into PV.
-  # and keep the custom directories/files into created directory.
+  # For mapping, We need to provide full path of the file or directory. 
+  # First we need to create the directory with 'CM_RESOURCES' name if it is not available into PV. 
+  # and keep the custom directories/files into created directory. 
   customFiles: []
   # In the below example we need to keep log4j2.xml file inside 'CM_RESOURCES' directory.
-  # so that the container will copy this file into respective directory.
+  # so that the container will copy this file into respective directory.   
   #customFiles:
   #  - /conf/log4j2.xml
 
@@ -230,23 +319,21 @@ ibm-ssp-cm:
     policyTypes:
     - Ingress
     - Egress
-
-    # apply ingress rule. Default allow all ingress traffic.
+    
+    # apply ingress rule.
     ingress:
-    - from: []
-      #- namespaceSelector:
-       #   matchLabels:
-        #    project: myproject
-      #- podSelector:
-       #   matchLabels:
-        #    role: frontend
-      #ports:
-      #- protocol: TCP
-       # port: 6379
-
-    # apply egress rule. Default allow all egress traffic
+    - from:
+      ports:
+      - protocol: TCP
+        port: 8443
+      - protocol: TCP
+        port: 62366
+        
+    # apply egress rule.
     egress:
-    - to: []
-      #ports:
-      #- protocol: TCP
-       # port: 5978
+    - to:
+      ports:
+      - protocol: TCP
+        port: 63366  
+        
+
