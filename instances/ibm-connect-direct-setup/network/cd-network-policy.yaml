@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cd-63-ibm-connect-direct
+  annotations:
+    argocd.argoproj.io/sync-wave: "209"
+  labels:
+    app.kubernetes.io/name: ibm-connect-direct
+    app.kubernetes.io/instance: cd-63
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ibm-connect-direct-1.3.0
+    release: cd-63
+  namespace: scd
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: ibm-connect-direct
+      app.kubernetes.io/instance: cd-63
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+# Network Policy from
+ 
+    # Allow traffic to following destinations. Anything not defined here will be blocked
+    ports:
+    - protocol: TCP
+      port: 1363
+    - protocol: TCP
+      port: 1364
