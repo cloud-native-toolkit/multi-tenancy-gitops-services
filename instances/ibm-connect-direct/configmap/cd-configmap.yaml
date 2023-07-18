@@ -1,0 +1,33 @@
+kind: ConfigMap 
+apiVersion: v1 
+metadata:
+  name: cd-63-ibm-connect-direct
+  annotations:
+    argocd.argoproj.io/sync-wave: "230"
+        # This is what defines this resource as a hook. Without this line, the
+        # job is considered part of the release.
+    "helm.sh/hook": "pre-install, pre-upgrade, pre-rollback"
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+  labels:
+    app.kubernetes.io/name: ibm-connect-direct
+    app.kubernetes.io/instance: cd-63
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ibm-connect-direct-1.3.0
+    release: cd-63
+  namespace: scd
+data:
+  # Configuration values can be set as key-value properties
+  cd_param_file: |
+    cdai_localNodeName=cdnode
+    cdai_serverPort=1364
+    cdai_clientPort=1363
+    cdai_localCertFile=certificate1
+    cdai_fileAgentEnable=n
+    cdai_localCertLabel=Client-API
+    cdai_trustedAddr=
+    # OUM parameter
+    cdai_enableOum=y
+  # Configuration values for LDAP support
+  # SACL configuration
+  saclConfig: "n"

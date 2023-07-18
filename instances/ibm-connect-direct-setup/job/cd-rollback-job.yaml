@@ -1,0 +1,140 @@
+
+# Source: ibm-connect-direct/templates/pre-rollback.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cd-63-ibm-connect-direct-prerollback
+  labels:
+    app.kubernetes.io/name: ibm-connect-direct
+    app.kubernetes.io/instance: cd-63
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ibm-connect-direct-1.2.9
+    release: cd-63
+  annotations:
+    "helm.sh/hook": pre-rollback
+    "helm.sh/hook-weight": "4"
+    "helm.sh/hook-delete-policy": hook-succeeded
+  namespace: scd
+spec:
+  template:
+    metadata:
+      name: "cd-63"
+      labels:
+        app.kubernetes.io/name: ibm-connect-direct-prerollback
+        app.kubernetes.io/instance: cd-63-prerollback
+        app.kubernetes.io/managed-by: Helm-prerollback
+        helm.sh/chart: ibm-connect-direct-1.2.9-prerollback
+        release: cd-63-prerollback
+      annotations:        
+        productID: "0e99fe73c7ae4b799e11d00a9bbf0db0"
+        productName: "IBM Sterling Connect Direct Premium Ed Certified Container"
+        productVersion: "6.2"
+        productMetric: "VIRTUAL_PROCESSOR_CORE"
+        productChargedContainers: "All"
+        checksum/config: e2dd4e6022b2f34f3a761cef6fe09403c94046c8272683a440eaddbf1be2755a
+    spec:
+      serviceAccountName: cd-63-ibm-connect-direct-serviceaccount
+      hostNetwork: false
+      hostPID: false
+      hostIPC: false
+      securityContext:
+        
+        fsGroup: 45678
+        runAsGroup: 45678
+        runAsNonRoot: true
+        runAsUser: 45678
+        supplementalGroups:
+        - 65534
+      affinity:        
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:      
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                - amd64
+          preferredDuringSchedulingIgnoredDuringExecution:        
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:  
+          preferredDuringSchedulingIgnoredDuringExecution:        
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:  
+          preferredDuringSchedulingIgnoredDuringExecution:
+      restartPolicy: Never
+      containers:
+        - name: pre-rollback-job
+          image: "cp.icr.io/cp/ibm-connectdirect/cdu6.2_certified_container_6.2.0.6:6.2.0.6_ifix014"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: UTC
+          command: ["/cdinstall/maintenance.sh", "rollback"]
+          volumeMounts:
+            - mountPath: /opt/cdunix/ndm/cfg
+              name: cd-vol
+              subPath: CFG
+            - mountPath: /opt/cdunix/work
+              name: cd-vol
+              subPath: WORK
+            - mountPath: /opt/cdunix/ndm/secure+
+              name: cd-vol
+              subPath: SECPLUS
+            - mountPath: /opt/cdunix/ndm/security
+              name: cd-vol
+              subPath: SECURITY
+            - mountPath: /opt/cdunix/process
+              name: cd-vol
+              subPath: PROCESS
+          # File agent support on container
+            - mountPath: /opt/cdunix/file_agent/config
+              name: cd-vol
+              subPath: FACONFIG
+            - mountPath: /opt/cdunix/file_agent/log
+              name: cd-vol
+              subPath: FALOG
+            - mountPath: /opt/cdfiles/cd_param_file
+              name: cd-param
+              subPath: cd_param_file
+            - mountPath: /opt/cdfiles/secret_files
+              name: cd-secret
+              readOnly: true
+            - mountPath: /opt/backup
+              name: cd-vol
+              subPath: BACKUP
+          securityContext:
+            
+            allowPrivilegeEscalation: true
+            capabilities:
+              add:
+              - CHOWN
+              - SETGID
+              - SETUID
+              - DAC_OVERRIDE
+              - FOWNER
+              - AUDIT_WRITE
+              - SYS_CHROOT
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsUser: 45678
+          resources:
+            limits:
+              cpu: 500m
+              ephemeral-storage: 5Gi
+              memory: 2000Mi
+            requests:
+              cpu: 500m
+              ephemeral-storage: 3Gi
+              memory: 2000Mi
+      volumes:
+      - name: cd-vol
+        persistentVolumeClaim:
+          claimName: cd-63-ibm-connect-direct-pvc
+      - name: cd-param
+        configMap:
+          name: cd-63-ibm-connect-direct
+      - name: cd-secret
+        secret:
+          secretName: cd-secret
