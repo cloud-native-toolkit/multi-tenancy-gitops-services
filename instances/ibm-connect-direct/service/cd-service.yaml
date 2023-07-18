@@ -1,0 +1,34 @@
+
+# Source: ibm-connect-direct/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "275"
+  name: cd-63-ibm-connect-direct
+  labels: 
+    app.kubernetes.io/name: ibm-connect-direct
+    app.kubernetes.io/instance: cd-63
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ibm-connect-direct-1.2.9
+    release: cd-63
+    author: IBM
+  namespace: scd
+
+spec:
+  selector:
+    app.kubernetes.io/name: ibm-connect-direct
+    app.kubernetes.io/instance: cd-63
+    release: cd-63
+    author: IBM
+  type: LoadBalancer
+  ports:
+    - name: api
+      port: 1363
+      targetPort: 1363
+      protocol: TCP
+    - name: ft
+      port: 1364
+      targetPort: 1364
+      protocol: TCP
+  sessionAffinity: ClientIP

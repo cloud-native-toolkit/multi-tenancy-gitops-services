@@ -1,0 +1,6 @@
+resources:
+- secrets/cd-secret.yaml
+- secrets/cd-cert-secret.yaml
+- network/cd-network-policy.yaml
+- storage/cd-pvc.yaml
+# - job/cd-job.yaml
