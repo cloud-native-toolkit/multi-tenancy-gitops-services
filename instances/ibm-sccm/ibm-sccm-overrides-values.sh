@@ -33,7 +33,7 @@ fi
 NS="sccm"
 
 SCCM_REPO=${SCCM_REPO:-"cp.icr.io/cp/ibm-scc/ibmscc"}
-SCCM_TAG=${SCCM_TAG:-"621_ifix06"}
+SCCM_TAG=${SCCM_TAG:-"6.3.0.0_ifix01_2023-01-15"}
 SCCM_PULLSECRECT=${SCCM_PULLSECRECT:-"ibm-entitlement-key"}
 DBTYPE=${DBTYPE:-"DB2"}
 DBHOST=$(oc get svc db2-lb -n ${NS} -o jsonpath='{ .spec.clusterIP}')

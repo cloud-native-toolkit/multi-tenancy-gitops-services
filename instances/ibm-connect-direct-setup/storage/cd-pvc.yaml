@@ -1,0 +1,22 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "210"
+  name: cd-63-ibm-connect-direct-pvc
+  labels:
+    app.kubernetes.io/name: ibm-connect-direct
+    app.kubernetes.io/instance: cd-63
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ibm-connect-direct-1.3.0
+    release: cd-63
+  namespace: scd
+spec:
+  # If present, use the storageClassName from the values.yaml, else use the
+  # default storage class, setting nil means using default storage class
+  storageClassName: "ibmc-file-gold-gid"
+  accessModes:
+    - "ReadWriteOnce" 
+  resources:
+    requests:
+      storage: "100Mi"
