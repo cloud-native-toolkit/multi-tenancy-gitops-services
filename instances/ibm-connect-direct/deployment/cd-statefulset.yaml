@@ -68,7 +68,7 @@ spec:
           preferredDuringSchedulingIgnoredDuringExecution: 
       containers:
         - name: cd-63-ibm-connect-direct
-          image: "cp.icr.io/cp/ibm-connectdirect/cdu6.3_certified_container_6.3.0.0:6.3.0.0_ifix000"
+          image: "cp.icr.io/cp/ibm-connectdirect/cdu6.3_certified_container_6.3.0.2:6.3.0.2_ifix009"
           imagePullPolicy: IfNotPresent
           env:
             - name: CD_License_Acceptance
