@@ -36,7 +36,7 @@ spec:
             - name: LICENSE
               value: accept
             - name: DB2INST1_PASSWORD
-              value: DB2_Passowrd-Change
+              value: <LW_DB_USER_PASSWORD>
 
           ports:
             - containerPort: 22
