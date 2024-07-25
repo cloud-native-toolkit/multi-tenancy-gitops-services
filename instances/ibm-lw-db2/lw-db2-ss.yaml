@@ -49,6 +49,7 @@ spec:
               protocol: TCP
             - containerPort: 60007
               protocol: TCP
+              
           # volumeMounts:
           #   - name: ibm-sfg-db2-1
           #     mountPath: /database
