@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lw-db2
+spec:
+  selector:
+    app: ibm-sfg-db2
+  ports:
+    - protocol: TCP
+      port: 50000
+      targetPort: 50000
+  type: ClusterIP

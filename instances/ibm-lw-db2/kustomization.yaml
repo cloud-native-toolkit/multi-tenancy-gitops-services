@@ -1,0 +1,3 @@
+resources:
+- ./lw-db2-ss.yaml
+- ./lw-db2-svc.yaml

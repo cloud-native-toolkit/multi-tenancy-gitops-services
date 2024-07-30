@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: lwfw
+spec:
+  ports:
+    - protocol: TCP
+      port: 5680
+      targetPort: 5680
+  selector:
+    app: lwfw
+  type: ClusterIP

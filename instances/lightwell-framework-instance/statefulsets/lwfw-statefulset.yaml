@@ -1,0 +1,49 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: lwfw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lwfw
+  template:
+    metadata:
+      labels:
+        app: lwfw
+    spec:
+      containers:
+        - name: lwfw
+          image: quay.io/shadyattia/lw-portal:v2.13
+          # command: [ "/bin/bash", "-c", "--" ]
+          # args: [ "while true; do sleep 30; done;" ]
+          ports:
+            - name: lwfw
+              containerPort: 5680
+              protocol: TCP
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+          - name: lw-app-prop
+            mountPath: /app/config
+          - name: lw-data
+            mountPath: /files
+      volumes:
+        - name: lw-app-prop
+          projected:
+            sources:
+            - secret:
+                name: lw-app-prop
+            - configMap:
+                name: lw-enc-jar
+                items:
+                  - key: LwEncryption.jar
+                    path: LwEncryption.jar
+                  - key: customer_LW_license.properties
+                    path: customer_LW_license.properties
+                  - key: application.properties
+                    path: application.properties
+        - name: lw-data
+          persistentVolumeClaim:
+            claimName: lwfw-files
+  serviceName: lwfw

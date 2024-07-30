@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lwfw
+  namespace: b2bi-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lwfw
+  template:
+    metadata:
+      labels:
+        app: lwfw
+    spec:
+      containers:
+        - name: lwfw
+          image: image-registry.openshift-image-registry.svc:5000/b2bi-prod/lw-2.13
+          # command: [ "/bin/bash", "-c", "--" ]
+          # args: [ "while true; do sleep 30; done;" ]
+          ports:
+            - name: lwfw
+              containerPort: 5680
+              protocol: TCP
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+          - name: lw-app-prop
+            mountPath: /app/config
+          - name: lw-data
+            mountPath: /files
+      volumes:
+        - name: lw-app-prop
+          projected:
+            sources:
+            - secret:
+                name: lw-app-prop
+            - configMap:
+                name: lw-enc-jar
+                items:
+                  - key: LwEncryption.jar
+                    path: LwEncryption.jar
+        - name: lw-data
+          persistentVolumeClaim:
+            claimName: lwfw-files
+  # serviceName: lwfw

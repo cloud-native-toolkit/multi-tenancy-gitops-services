@@ -1,0 +1,16 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: lwfw-soap
+  namespace: b2bi-prod
+spec:
+  host: >-
+    asi-b2bi-prod.apps.667c59b0808b98001eb0355c.cloud.techzone.ibm.com
+  path: /portal_soap
+  to:
+    kind: Service
+    name: ibm-sfg-b2bi-prod-b2bi-asi-backend-svc
+    weight: 100
+  port:
+    targetPort: 30201
+  wildcardPolicy: None
