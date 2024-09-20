@@ -1,0 +1,12 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: lwfw
+spec:
+  to:
+    kind: Service
+    name: lwfw
+    weight: 100
+  port:
+    targetPort: 5680
+  wildcardPolicy: None

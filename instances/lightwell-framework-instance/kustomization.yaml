@@ -1,0 +1,19 @@
+resources:
+- pvcs/lwfw-files-pvc.yaml
+# - routes/lwfw-portal-soap-route.yaml
+- routes/portal-soap-route.yaml
+- routes/lwfw-route.yaml
+- secrets/lw-app-prop-secret.yaml
+# - services/lwfw-portal-soap-service.yaml
+- services/lwfw-service.yaml
+- statefulsets/lwfw-statefulset.yaml
+#- deployments/lw-deployment.yaml
+generatorOptions:
+ disableNameSuffixHash: true
+configMapGenerator:
+- name: lw-enc-jar
+  behavior: create
+  files:
+  - configmap/LwEncryption.jar
+  - configmap/customer_LW_license.properties
+  - configmap/application.properties

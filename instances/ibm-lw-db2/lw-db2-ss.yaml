@@ -1,0 +1,86 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: ibm-sfg-db2
+  namespace: b2bi-prod
+  labels:
+    app: ibm-sfg-db2
+    app.kubernetes.io/component: ibm-sfg-db2
+    app.kubernetes.io/instance: ibm-sfg-db2
+    app.kubernetes.io/name: ibm-sfg-db2
+    app.kubernetes.io/part-of: ibm-sfg-db2
+    app.openshift.io/runtime-namespace: b2bi-prod
+spec:
+  serviceName: lw-db2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ibm-sfg-db2
+  template:
+    metadata:
+      labels:
+        app: ibm-sfg-db2
+      annotations:
+        openshift.io/generated-by: OpenShiftWebConsole
+    spec:
+      # securityContext:
+      #   privileged: true
+      serviceAccountName: db2
+      containers:
+        - name: ibm-sfg-db2
+          securityContext:
+            privileged: true
+          image: quay.io/shadyattia/lw-db:v1.3
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: LICENSE
+              value: accept
+            - name: DB2INST1_PASSWORD
+              value: 
+
+
+          ports:
+            - containerPort: 22
+              protocol: TCP
+            - containerPort: 50000
+              protocol: TCP
+            - containerPort: 55000
+              protocol: TCP
+            - containerPort: 60006
+              protocol: TCP
+            - containerPort: 60007
+              protocol: TCP
+              
+          # volumeMounts:
+          #   - name: ibm-sfg-db2-1
+          #     mountPath: /database
+          #   - name: ibm-sfg-db2-2
+          #     mountPath: /hadr
+          # terminationMessagePath: /dev/termination-log
+          # terminationMessagePolicy: File
+  # volumeClaimTemplates:
+  #   - metadata:
+  #       name: ibm-sfg-db2-1
+  #     spec:
+  #       accessModes: [ "ReadWriteOnce" ]
+  #       storageClassName: "ibmc-file-gold-gid"
+  #       resources:
+  #         requests:
+  #           storage: 1Gi
+  #   - metadata:
+  #       name: ibm-sfg-db2-2
+  #     spec:
+  #       accessModes: [ "ReadWriteOnce" ]
+  #       storageClassName: "ibmc-file-gold-gid"
+  #       resources:
+  #         requests:
+  #           storage: 1Gi
+      # restartPolicy: Always
+      # dnsPolicy: ClusterFirst
+  # strategy:
+  #   type: RollingUpdate
+  #   rollingUpdate:
+  #     maxUnavailable: 25%
+  #     maxSurge: 25%
+  revisionHistoryLimit: 10
+  # progressDeadlineSeconds: 600
