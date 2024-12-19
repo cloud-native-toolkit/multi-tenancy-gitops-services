@@ -1,0 +1,40 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vault01-server-binding
+  annotations:
+    argocd.argoproj.io/sync-wave: "230"
+  labels:
+    helm.sh/chart: vault-0.29.1
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/instance: vault01
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
+subjects:
+- kind: ServiceAccount
+  name: vault01
+  namespace: vault
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vault01-agent-injector-binding
+  annotations:
+    argocd.argoproj.io/sync-wave: "230"
+  labels:
+    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/instance: vault01
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: vault01-agent-injector-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: vault01-agent-injector
+  namespace: vault

@@ -1,0 +1,8 @@
+resources:
+
+#roles
+- roles/clusterrole.yaml
+- roles/clusterrolebinding.yaml
+
+#storage
+- storage/pvc.yaml

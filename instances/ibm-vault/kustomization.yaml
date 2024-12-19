@@ -1,0 +1,14 @@
+resources:
+
+#deployment
+- deployment/vault-statefulset.yaml
+- deployment/vault-deployment.yaml
+- deployment/MutatingWebhookConfiguration.yaml
+
+#service
+- service/injector-service.yaml
+- service/service.yaml
+- service/vault-service.yaml
+
+#route
+- route/vault-ui-route.yaml

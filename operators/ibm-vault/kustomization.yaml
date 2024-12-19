@@ -1,0 +1,3 @@
+resources:
+- vault/vault-catalogsource.yaml
+- vault/vault-subscription.yaml

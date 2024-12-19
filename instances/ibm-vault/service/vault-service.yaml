@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault01
+  namespace: vault
+  annotations:
+    argocd.argoproj.io/sync-wave: "290"
+  labels:
+    helm.sh/chart: vault-0.29.1
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/instance: vault01
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+
+spec:
+  # We want the servers to become available even if they're not ready
+  # since this DNS is also used for join operations.
+  publishNotReadyAddresses: true
+  ports:
+    - name: http
+      port: 8200
+      targetPort: 8200
+    - name: https-internal
+      port: 8201
+      targetPort: 8201
+  selector:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/instance: vault01
+    component: server
